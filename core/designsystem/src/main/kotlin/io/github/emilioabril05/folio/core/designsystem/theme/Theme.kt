@@ -43,16 +43,53 @@ fun FolioTheme(
     }
 }
 
+// Todos los roles de Material 3 salen de la paleta: un solo acento y ningún color por defecto de Material.
+// Solo los roles de error y el velo de los diálogos conservan los valores de Material.
 private fun FolioPalette.toColorScheme(darkTheme: Boolean): ColorScheme {
     val base = if (darkTheme) darkColorScheme() else lightColorScheme()
     return base.copy(
         primary = accent,
         onPrimary = onAccent,
+        primaryContainer = accent,
+        onPrimaryContainer = onAccent,
+        inversePrimary = accent,
+        secondary = accent,
+        onSecondary = onAccent,
+        secondaryContainer = surfaceHigh,
+        onSecondaryContainer = text,
+        tertiary = accent,
+        onTertiary = onAccent,
+        tertiaryContainer = surfaceHigh,
+        onTertiaryContainer = text,
         background = background,
         onBackground = text,
         surface = surface,
         onSurface = text,
-        surfaceContainerLow = surface,
+        surfaceVariant = surfaceHigh,
         onSurfaceVariant = textSecondary,
+        surfaceTint = surface,
+        inverseSurface = text,
+        inverseOnSurface = background,
+        outline = outline,
+        outlineVariant = surfaceHigh,
+        surfaceBright = surface,
+        surfaceDim = background,
+        surfaceContainerLowest = surface,
+        surfaceContainerLow = surface,
+        surfaceContainer = surface,
+        surfaceContainerHigh = surfaceHigh,
+        surfaceContainerHighest = surfaceHigh,
+        primaryFixed = accent,
+        primaryFixedDim = accent,
+        onPrimaryFixed = onAccent,
+        onPrimaryFixedVariant = onAccent,
+        secondaryFixed = accent,
+        secondaryFixedDim = accent,
+        onSecondaryFixed = onAccent,
+        onSecondaryFixedVariant = onAccent,
+        tertiaryFixed = accent,
+        tertiaryFixedDim = accent,
+        onTertiaryFixed = onAccent,
+        onTertiaryFixedVariant = onAccent,
     )
 }

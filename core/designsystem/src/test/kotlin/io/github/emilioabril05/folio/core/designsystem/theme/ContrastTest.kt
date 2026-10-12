@@ -22,6 +22,9 @@ class ContrastTest {
                     "texto/superficie" to (palette.text to palette.surface),
                     "secundario/fondo" to (palette.textSecondary to palette.background),
                     "secundario/superficie" to (palette.textSecondary to palette.surface),
+                    "texto/superficie elevada" to (palette.text to palette.surfaceHigh),
+                    "secundario/superficie elevada" to (palette.textSecondary to palette.surfaceHigh),
+                    "fondo/texto (superficie inversa)" to (palette.background to palette.text),
                     "sobre acento/acento" to (palette.onAccent to palette.accent),
                     "acento/superficie" to (palette.accent to palette.surface),
                 )
@@ -37,6 +40,16 @@ class ContrastTest {
         palettes.forEach { (name, palette) ->
             val ratio = contrastRatio(palette.accent, palette.surface)
             assertTrue("$name da $ratio", ratio >= ICON_MIN_CONTRAST)
+        }
+    }
+
+    @Test
+    fun `el contorno de los controles cumple 3 a 1 sobre superficie y fondo`() {
+        palettes.forEach { (name, palette) ->
+            listOf(palette.surface, palette.background).forEach { background ->
+                val ratio = contrastRatio(palette.outline, background)
+                assertTrue("$name da $ratio", ratio >= ICON_MIN_CONTRAST)
+            }
         }
     }
 
