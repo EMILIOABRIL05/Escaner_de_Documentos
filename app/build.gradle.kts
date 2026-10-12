@@ -35,4 +35,5 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     testImplementation(projects.core.testing)
+    testImplementation(libs.konsist)
 }
