@@ -20,6 +20,9 @@ kotlin {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
+    compileOnly(libs.ktlint.gradlePlugin)
+    compileOnly(libs.detekt.gradlePlugin)
+    compileOnly(libs.kover.gradlePlugin)
 }
 
 gradlePlugin {
@@ -43,6 +46,10 @@ gradlePlugin {
         register("jvmLibrary") {
             id = libs.plugins.folio.jvm.library.get().pluginId
             implementationClass = "JvmLibraryConventionPlugin"
+        }
+        register("quality") {
+            id = libs.plugins.folio.quality.get().pluginId
+            implementationClass = "QualityConventionPlugin"
         }
         register("hilt") {
             id = libs.plugins.folio.hilt.get().pluginId
