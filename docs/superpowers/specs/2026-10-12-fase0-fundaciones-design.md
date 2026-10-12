@@ -145,7 +145,7 @@ La verificación de alineación a 16 KB se agrega en v2, cuando entre OpenCV. En
 2. **`FolioCard`**: tarjeta agrupada estilo iOS para listas y ajustes, con esquina de 16 dp, sombra suave y separadores finos.
 3. **`FolioEmptyState`**: ícono, título, texto y una acción; es la base de "Escanea tu primera hoja".
 
-Los componentes reciben sus textos por parámetro. Los textos visibles de la app viven en `strings.xml`, en `values/` (inglés, por defecto) y `values-es/`.
+Los componentes reciben sus textos por parámetro. Los textos visibles de la app viven en `strings.xml`: `values/` en español (idioma por defecto) y `values-en/` en inglés (secundario).
 
 **Pruebas del sistema de diseño**
 
