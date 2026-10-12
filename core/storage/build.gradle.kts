@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.folio.android.library)
+    alias(libs.plugins.folio.hilt)
 }
 
 android {
@@ -8,4 +9,9 @@ android {
 
 dependencies {
     implementation(projects.core.model)
+    implementation(projects.core.domain)
+    implementation(libs.kotlinx.coroutines.core)
+
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

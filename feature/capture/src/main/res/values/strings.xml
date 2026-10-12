@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="capture_idle_title">Escanea tu primera hoja</string>
+    <string name="capture_idle_tip">Pon la hoja sobre un fondo oscuro y con buena luz.</string>
+    <string name="capture_action_scan">Escanear</string>
+    <string name="capture_action_scan_again">Escanear otra vez</string>
+    <string name="capture_action_retry">Reintentar</string>
+    <string name="capture_saved_message">Puedes seguir escaneando.</string>
+
+    <plurals name="capture_saving_title">
+        <item quantity="one">Guardando %d página…</item>
+        <item quantity="many">Guardando %d páginas…</item>
+        <item quantity="other">Guardando %d páginas…</item>
+    </plurals>
+    <plurals name="capture_saved_title">
+        <item quantity="one">%d página guardada</item>
+        <item quantity="many">%d páginas guardadas</item>
+        <item quantity="other">%d páginas guardadas</item>
+    </plurals>
+
+    <string name="capture_error_unavailable_title">Este teléfono no tiene el escáner</string>
+    <string name="capture_error_unavailable_solution">Actualiza Google Play services y vuelve a intentarlo.</string>
+    <string name="capture_error_space_title">No hay espacio para guardar</string>
+    <string name="capture_error_space_solution">Libera espacio en el teléfono y vuelve a escanear.</string>
+    <string name="capture_error_unreadable_title">No se pudo leer una página</string>
+    <string name="capture_error_unreadable_solution">Vuelve a escanear las hojas.</string>
+    <string name="capture_error_unknown_title">No se pudo escanear</string>
+    <string name="capture_error_unknown_solution">Vuelve a intentarlo.</string>
+</resources>

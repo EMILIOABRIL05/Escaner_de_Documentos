@@ -24,7 +24,7 @@ Folio no recopila ningún dato. No tiene cuentas, servidores propios, analítica
 | --- | --- | --- |
 | Ninguno de cámara | El escáner usa la cámara de Google Play services | Nunca se pide |
 | Fotos | No se pide: el selector de fotos del sistema solo entrega las imágenes que eliges | Nunca se pide |
-| Internet | Google Drive y Modo Escritorio (futuras versiones) | Se concede al instalar |
+| Internet y estado de la red | Los declara ML Kit de Google, que hace el escaneo en el teléfono; más adelante también Google Drive y Modo Escritorio. Folio no envía tus documentos a internet | Se concede al instalar |
 | Almacenamiento (Android 8 y 9) | Guardar en Descargas | La primera vez que guardas |
 
 Folio elimina el permiso de identificador de publicidad (`AD_ID`) aunque alguna biblioteca lo pida.

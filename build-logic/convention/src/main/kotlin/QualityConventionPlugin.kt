@@ -2,7 +2,6 @@ import io.github.emilioabril05.folio.buildlogic.libs
 import io.github.emilioabril05.folio.buildlogic.library
 import io.github.emilioabril05.folio.buildlogic.pluginId
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
-import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -12,7 +11,7 @@ import org.jlleitschuh.gradle.ktlint.KtlintExtension
 /**
  * Puerta de calidad de cada módulo: ktlint (formato), detekt (código limpio) y Kover (cobertura).
  *
- * La cobertura mínima solo se exige en los módulos `core`, salvo `core:testing`, que contiene dobles de prueba.
+ * La cobertura mínima de los módulos `core` se verifica en conjunto desde la raíz del proyecto.
  */
 class QualityConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -32,21 +31,10 @@ class QualityConventionPlugin : Plugin<Project> {
             dependencies {
                 add("detektPlugins", libs.library("compose-rules-detekt"))
             }
-
-            if (requiresCoverage()) {
-                extensions.configure<KoverProjectExtension> {
-                    reports.verify.rule {
-                        minBound(MIN_LINE_COVERAGE_PERCENT)
-                    }
-                }
-            }
         }
     }
 
-    private fun Project.requiresCoverage(): Boolean = path.startsWith(":core:") && path != ":core:testing"
-
     private companion object {
         const val DETEKT_CONFIG = "config/detekt/detekt.yml"
-        const val MIN_LINE_COVERAGE_PERCENT = 80
     }
 }

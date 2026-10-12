@@ -1,0 +1,110 @@
+package io.github.emilioabril05.folio.feature.capture
+
+import android.net.Uri
+import app.cash.turbine.test
+import io.github.emilioabril05.folio.core.domain.CreateDocumentFromScan
+import io.github.emilioabril05.folio.core.domain.DocumentTitleFormatter
+import io.github.emilioabril05.folio.core.domain.StorageError
+import io.github.emilioabril05.folio.core.testing.FakeDocumentRepository
+import io.github.emilioabril05.folio.core.testing.FakePageStore
+import io.github.emilioabril05.folio.core.testing.MainDispatcherRule
+import io.github.emilioabril05.folio.core.testing.SequentialIdProvider
+import io.github.emilioabril05.folio.engine.api.ScanError
+import io.github.emilioabril05.folio.engine.api.ScanOutcome
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
+
+@RunWith(RobolectricTestRunner::class)
+class CaptureViewModelTest {
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
+    private val pages =
+        listOf(Uri.parse("content://scan/1"), Uri.parse("content://scan/2"), Uri.parse("content://scan/3"))
+    private val repository = FakeDocumentRepository()
+
+    private fun viewModel(store: FakePageStore = FakePageStore()) =
+        CaptureViewModel(
+            CreateDocumentFromScan(
+                pageStore = store,
+                documents = repository,
+                ids = SequentialIdProvider(),
+                titles = DocumentTitleFormatter { "Escaneo $it" },
+                clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC),
+            ),
+        )
+
+    @Test
+    fun `empieza listo para escanear`() {
+        assertEquals(CaptureUiState.Idle, viewModel().uiState.value)
+    }
+
+    @Test
+    fun `al terminar el escaneo guarda las páginas e informa cuántas`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.uiState.test {
+                assertEquals(CaptureUiState.Idle, awaitItem())
+                viewModel.onEvent(CaptureEvent.ScanFinished(ScanOutcome.Success(pages)))
+                assertEquals(CaptureUiState.Saving(pageCount = 3), awaitItem())
+                assertEquals(CaptureUiState.Saved(pageCount = 3), awaitItem())
+            }
+            assertEquals(
+                3,
+                repository.documents
+                    .single()
+                    .pages.size,
+            )
+        }
+
+    @Test
+    fun `si el usuario cancela vuelve a estar listo sin guardar nada`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.onEvent(CaptureEvent.ScanFinished(ScanOutcome.Cancelled))
+
+            assertEquals(CaptureUiState.Idle, viewModel.uiState.value)
+            assertEquals(emptyList<Any>(), repository.documents)
+        }
+
+    @Test
+    fun `si el escáner no existe en el teléfono lo explica`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.onEvent(CaptureEvent.ScanFailed(ScanError.Unavailable))
+
+            assertEquals(CaptureUiState.Failed(CaptureFailure.ScannerUnavailable), viewModel.uiState.value)
+        }
+
+    @Test
+    fun `si falta espacio lo explica y no deja el documento a medias`() =
+        runTest {
+            val viewModel = viewModel(FakePageStore(failWith = StorageError.NotEnoughSpace))
+
+            viewModel.onEvent(CaptureEvent.ScanFinished(ScanOutcome.Success(pages)))
+
+            assertEquals(CaptureUiState.Failed(CaptureFailure.NotEnoughSpace), viewModel.uiState.value)
+            assertEquals(emptyList<Any>(), repository.documents)
+        }
+
+    @Test
+    fun `al cerrar el mensaje vuelve a estar listo`() =
+        runTest {
+            val viewModel = viewModel()
+            viewModel.onEvent(CaptureEvent.ScanFailed(ScanError.Unknown))
+
+            viewModel.onEvent(CaptureEvent.MessageDismissed)
+
+            assertEquals(CaptureUiState.Idle, viewModel.uiState.value)
+        }
+}

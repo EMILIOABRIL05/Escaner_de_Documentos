@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.folio.android.library)
+    alias(libs.plugins.folio.hilt)
 }
 
 android {
@@ -8,4 +9,6 @@ android {
 
 dependencies {
     implementation(projects.engine.api)
+    implementation(libs.mlkit.document.scanner)
+    implementation(libs.kotlinx.coroutines.play.services)
 }

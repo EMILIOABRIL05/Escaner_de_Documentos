@@ -1,11 +1,9 @@
 plugins {
-    alias(libs.plugins.folio.android.library)
-}
-
-android {
-    namespace = "io.github.emilioabril05.folio.core.testing"
+    alias(libs.plugins.folio.jvm.library)
 }
 
 dependencies {
     api(projects.core.domain)
+    api(libs.kotlinx.coroutines.test)
+    api(libs.junit4)
 }
