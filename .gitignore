@@ -1,0 +1,25 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.kotlin/
+
+# Configuración local y secretos
+local.properties
+*.jks
+*.keystore
+*.p12
+keystore.properties
+google-services.json
+
+# IDE
+.idea/*
+!.idea/codeStyles/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Agente
+.superpowers/
