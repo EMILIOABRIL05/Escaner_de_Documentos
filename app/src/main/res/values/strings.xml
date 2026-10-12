@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Folio</string>
+    <string name="empty_title">Escanea tu primera hoja</string>
+    <string name="empty_message">Tus documentos aparecerán aquí.</string>
+    <string name="action_scan">Escanear</string>
 </resources>

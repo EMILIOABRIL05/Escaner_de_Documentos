@@ -23,6 +23,7 @@ junit4 = "4.13.2"
 robolectric = "4.17"
 androidxTestExtJunit = "1.3.0"
 konsist = "0.18.1"
+roborazzi = "1.76.0"
 
 # Calidad
 ktlintGradle = "14.2.0"
@@ -52,6 +53,8 @@ junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 konsist = { group = "com.lemonappdev", name = "konsist", version.ref = "konsist" }
+roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
+roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
 compose-rules-detekt = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "composeRulesDetekt" }
 
 # Solo para build-logic
@@ -71,6 +74,7 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 
 # Plugins de convención (build-logic)
 folio-android-application = { id = "folio.android.application" }

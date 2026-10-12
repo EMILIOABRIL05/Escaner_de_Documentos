@@ -4,14 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.emilioabril05.folio.core.designsystem.component.FolioEmptyState
+import io.github.emilioabril05.folio.core.designsystem.theme.FolioTheme
+import io.github.emilioabril05.folio.core.designsystem.R as DesignR
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -19,12 +24,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        modifier = Modifier.safeDrawingPadding(),
-                    )
+            FolioTheme {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                    Box(modifier = Modifier.safeDrawingPadding(), contentAlignment = Alignment.Center) {
+                        FolioEmptyState(
+                            icon = painterResource(DesignR.drawable.ic_description),
+                            title = stringResource(R.string.empty_title),
+                            message = stringResource(R.string.empty_message),
+                            actionText = stringResource(R.string.action_scan),
+                            onAction = {},
+                        )
+                    }
                 }
             }
         }

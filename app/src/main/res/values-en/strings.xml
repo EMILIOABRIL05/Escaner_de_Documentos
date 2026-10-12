@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="empty_title">Scan your first page</string>
+    <string name="empty_message">Your documents will appear here.</string>
+    <string name="action_scan">Scan</string>
+</resources>
