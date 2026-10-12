@@ -33,6 +33,9 @@ jobs:
       - name: Formato, análisis estático, lint, pruebas y cobertura
         run: ./gradlew ktlintCheck detekt lint testDebugUnitTest koverVerify --continue
 
+      - name: Verificar capturas de pantalla
+        run: ./gradlew verifyRoborazziDebug
+
       - name: Compilar release con R8
         run: ./gradlew assembleRelease
 
@@ -44,4 +47,5 @@ jobs:
           path: |
             **/build/reports/**
             **/build/test-results/**
+            **/build/outputs/roborazzi/**
           retention-days: 14
