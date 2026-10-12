@@ -8,8 +8,10 @@ import androidx.compose.ui.graphics.Color
 data class FolioPalette(
     val background: Color,
     val surface: Color,
+    val surfaceHigh: Color,
     val text: Color,
     val textSecondary: Color,
+    val outline: Color,
     val accent: Color,
     val onAccent: Color,
 )
@@ -20,8 +22,10 @@ object FolioColors {
         FolioPalette(
             background = Color(0xFFF5F5F7),
             surface = Color(0xFFFFFFFF),
+            surfaceHigh = Color(0xFFEBEBEF),
             text = Color(0xFF111827),
             textSecondary = Color(0xFF4B5563),
+            outline = Color(0xFF6B7280),
             accent = Color(0xFF2563EB),
             onAccent = Color(0xFFFFFFFF),
         )
@@ -31,8 +35,10 @@ object FolioColors {
         FolioPalette(
             background = Color(0xFF000000),
             surface = Color(0xFF1C1C1E),
+            surfaceHigh = Color(0xFF2C2C2E),
             text = Color(0xFFF3F4F6),
             textSecondary = Color(0xFF9CA3AF),
+            outline = Color(0xFF8E8E93),
             accent = Color(0xFF60A5FA),
             onAccent = Color(0xFF0B1220),
         )

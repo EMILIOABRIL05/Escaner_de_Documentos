@@ -24,13 +24,31 @@ private val Action = TextStyle(fontFamily = InterFontFamily, fontWeight = FontWe
 private val Note = TextStyle(fontFamily = InterFontFamily, fontWeight = FontWeight.Normal, fontSize = 13.sp)
 private val NoteStrong = TextStyle(fontFamily = InterFontFamily, fontWeight = FontWeight.Medium, fontSize = 13.sp)
 
-/** Escala tipográfica de Folio (plan §10.6): título grande 34, título 22, cuerpo 17, nota 13; siempre en sp. */
+private fun TextStyle.inInter(): TextStyle = copy(fontFamily = InterFontFamily)
+
+private val MaterialDefaults = Typography()
+
+/**
+ * Escala tipográfica de Folio (plan §10.6): título grande 34, título 22, cuerpo 17, nota 13; siempre en sp.
+ * Los demás estilos conservan los tamaños de Material, pero también en Inter.
+ */
 val FolioTypography =
-    Typography(
-        headlineLarge = LargeTitle,
-        titleLarge = Title,
-        bodyLarge = Body,
-        labelLarge = Action,
-        bodySmall = Note,
-        labelMedium = NoteStrong,
-    )
+    with(MaterialDefaults) {
+        Typography(
+            displayLarge = displayLarge.inInter(),
+            displayMedium = displayMedium.inInter(),
+            displaySmall = displaySmall.inInter(),
+            headlineLarge = LargeTitle,
+            headlineMedium = headlineMedium.inInter(),
+            headlineSmall = headlineSmall.inInter(),
+            titleLarge = Title,
+            titleMedium = titleMedium.inInter(),
+            titleSmall = titleSmall.inInter(),
+            bodyLarge = Body,
+            bodyMedium = bodyMedium.inInter(),
+            bodySmall = Note,
+            labelLarge = Action,
+            labelMedium = NoteStrong,
+            labelSmall = labelSmall.inInter(),
+        )
+    }
