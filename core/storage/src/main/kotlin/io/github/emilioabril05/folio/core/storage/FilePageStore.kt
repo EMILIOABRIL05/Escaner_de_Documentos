@@ -47,6 +47,26 @@ class FilePageStore
                 }
             }
 
+        override suspend fun copyOriginal(
+            fromDocument: DocumentId,
+            fromPage: PageId,
+            toDocument: DocumentId,
+            toPage: PageId,
+        ): Result<Unit> =
+            withContext(ioDispatcher) {
+                val input =
+                    try {
+                        originalFile(context, fromDocument, fromPage).inputStream()
+                    } catch (_: IOException) {
+                        null
+                    }
+                if (input == null) {
+                    Result.failure(StorageFailure(StorageError.SourceUnreadable))
+                } else {
+                    copyOrCleanUp(input, originalFile(context, toDocument, toPage))
+                }
+            }
+
         override suspend fun deleteOriginal(
             documentId: DocumentId,
             pageId: PageId,

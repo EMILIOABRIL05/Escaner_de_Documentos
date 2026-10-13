@@ -68,14 +68,20 @@ class EstimatePdfSize
                     .first()
                     ?.pages
                     ?.sortedBy { it.position }
-            val first = pages?.firstOrNull() ?: return null
+            val first = pages?.firstOrNull()
             val firstPageBytes =
-                renderer
-                    .export(documentId, first, profile)
-                    .getOrNull()
-                    ?.bytes
-                    ?.size ?: return null
-            return (firstPageBytes * pages.size * SIZE_ESTIMATE_MARGIN).toLong()
+                first?.let {
+                    renderer
+                        .export(documentId, it, profile)
+                        .getOrNull()
+                        ?.bytes
+                        ?.size
+                }
+            return if (pages == null || firstPageBytes == null) {
+                null
+            } else {
+                (firstPageBytes * pages.size * SIZE_ESTIMATE_MARGIN).toLong()
+            }
         }
     }
 

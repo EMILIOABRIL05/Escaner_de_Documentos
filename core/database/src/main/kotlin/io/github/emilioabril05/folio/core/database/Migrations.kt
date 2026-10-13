@@ -22,6 +22,14 @@ internal val Migration2To3: Migration =
         }
     }
 
+/** Versión 3 a 4: cada documento puede estar en la papelera; los existentes quedan activos. */
+internal val Migration3To4: Migration =
+    object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE documents ADD COLUMN trashedAtMillis INTEGER")
+        }
+    }
+
 private val CROP_COLUMN_DEFAULTS =
     listOf(
         "cropTopLeftX" to "0.0",

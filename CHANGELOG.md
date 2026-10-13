@@ -13,6 +13,7 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 - Cada escaneo recibe un nombre automático con la fecha, por ejemplo "Escaneo 2026-10-12 22.30".
 - Ajusta a mano las 4 esquinas de una hoja, con una lupa para ser preciso, y deshaz o rehaz cada cambio. La foto original nunca se modifica.
 - Con TalkBack, cada esquina se mueve con acciones de accesibilidad, sin necesidad de arrastrar.
+- Biblioteca de documentos con búsqueda por título, renombrar, duplicar y papelera de 30 días con restaurar.
 - Revisa tus páginas en una cuadrícula: gíralas, reordénalas arrastrando, elimínalas (con "Deshacer") y añade más.
 - Filtros de un toque para todas las páginas: Original, Documento (blanco y negro sin sombras), Grises y Color.
 - Envía el PDF por WhatsApp, compártelo o guárdalo en el teléfono, eligiendo la calidad (Ligero, Equilibrado o Alta) con su peso estimado.

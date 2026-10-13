@@ -59,55 +59,72 @@ fun ExportScreen(
                 modifier = Modifier.semantics { heading() },
             )
         }
-        Column(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(FolioSpacing.m)
-                    .selectableGroup(),
-            verticalArrangement = Arrangement.spacedBy(FolioSpacing.s),
-        ) {
-            Text(text = stringResource(R.string.export_quality), style = MaterialTheme.typography.labelLarge)
-            ExportProfile.entries.forEach { profile ->
-                ProfileOption(
-                    profile = profile,
-                    estimate = uiState.estimates[profile],
-                    selected = profile == uiState.profile,
-                    onSelect = { onEvent(ExportEvent.SelectProfile(profile)) },
-                )
-            }
-            uiState.failure?.let { failure ->
-                Text(
-                    text = stringResource(failure.messageRes()),
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-                )
-            }
-        }
-        Column(
-            modifier = Modifier.padding(FolioSpacing.m),
-            verticalArrangement = Arrangement.spacedBy(FolioSpacing.s),
-        ) {
-            OutlinedButton(
-                onClick = { onEvent(ExportEvent.Send(ExportTarget.Save)) },
-                enabled = !uiState.exporting,
-                modifier = Modifier.fillMaxWidth().heightIn(min = MinTouch),
-            ) { Text(stringResource(R.string.export_save)) }
-            if (whatsAppAvailable) {
-                OutlinedButton(
-                    onClick = { onEvent(ExportEvent.Send(ExportTarget.WhatsApp)) },
-                    enabled = !uiState.exporting,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = MinTouch),
-                ) { Text(stringResource(R.string.export_whatsapp)) }
-            }
-            FolioPrimaryButton(
-                text = stringResource(R.string.export_share),
-                supportingText = uiState.estimates[uiState.profile]?.let { estimateText(it) },
-                onClick = { onEvent(ExportEvent.Send(ExportTarget.Share)) },
-                loading = uiState.exporting,
+        QualityOptions(uiState, onEvent, Modifier.weight(1f))
+        SendActions(uiState, whatsAppAvailable, onEvent)
+    }
+}
+
+@Composable
+private fun QualityOptions(
+    uiState: ExportUiState,
+    onEvent: (ExportEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .verticalScroll(rememberScrollState())
+                .padding(FolioSpacing.m)
+                .selectableGroup(),
+        verticalArrangement = Arrangement.spacedBy(FolioSpacing.s),
+    ) {
+        Text(text = stringResource(R.string.export_quality), style = MaterialTheme.typography.labelLarge)
+        ExportProfile.entries.forEach { profile ->
+            ProfileOption(
+                profile = profile,
+                estimate = uiState.estimates[profile],
+                selected = profile == uiState.profile,
+                onSelect = { onEvent(ExportEvent.SelectProfile(profile)) },
             )
         }
+        uiState.failure?.let { failure ->
+            Text(
+                text = stringResource(failure.messageRes()),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SendActions(
+    uiState: ExportUiState,
+    whatsAppAvailable: Boolean,
+    onEvent: (ExportEvent) -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(FolioSpacing.m),
+        verticalArrangement = Arrangement.spacedBy(FolioSpacing.s),
+    ) {
+        OutlinedButton(
+            onClick = { onEvent(ExportEvent.Send(ExportTarget.Save)) },
+            enabled = !uiState.exporting,
+            modifier = Modifier.fillMaxWidth().heightIn(min = MinTouch),
+        ) { Text(stringResource(R.string.export_save)) }
+        if (whatsAppAvailable) {
+            OutlinedButton(
+                onClick = { onEvent(ExportEvent.Send(ExportTarget.WhatsApp)) },
+                enabled = !uiState.exporting,
+                modifier = Modifier.fillMaxWidth().heightIn(min = MinTouch),
+            ) { Text(stringResource(R.string.export_whatsapp)) }
+        }
+        FolioPrimaryButton(
+            text = stringResource(R.string.export_share),
+            supportingText = uiState.estimates[uiState.profile]?.let { estimateText(it) },
+            onClick = { onEvent(ExportEvent.Send(ExportTarget.Share)) },
+            loading = uiState.exporting,
+        )
     }
 }
 

@@ -14,14 +14,17 @@ value class PageId(
     val value: String,
 )
 
+private const val QUARTER_DEGREES = 90
+private const val THREE_QUARTER_TURNS = 3
+
 /** Giro de una página, en pasos de 90° en sentido horario. */
 enum class Rotation(
     val degrees: Int,
 ) {
     None(0),
-    Quarter(90),
-    Half(180),
-    ThreeQuarters(270),
+    Quarter(QUARTER_DEGREES),
+    Half(QUARTER_DEGREES * 2),
+    ThreeQuarters(QUARTER_DEGREES * THREE_QUARTER_TURNS),
     ;
 
     /** El giro siguiente, 90° más en sentido horario. */

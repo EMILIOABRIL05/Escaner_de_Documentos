@@ -72,9 +72,7 @@ class CaptureRouteTest {
                 CaptureRoute(
                     scanner = unavailableScanner,
                     photoTarget = { PageSource("content://folio.files/captures/foto.jpg") },
-                    onEditCrop = { _, _ -> },
-                    onOpenReview = {},
-                    onPagesAdded = {},
+                    navigation = CaptureNavigation(onEditCrop = { _, _ -> }, onOpenReview = {}, onPagesAdded = {}),
                     viewModel = viewModel,
                 )
             }

@@ -73,6 +73,27 @@ class FilePageStoreTest {
         }
 
     @Test
+    fun `copia el original de una página a otro documento`() =
+        runTest {
+            val bytes = byteArrayOf(7, 8, 9)
+            store.saveOriginal(documentId, pageId, sourceFile(bytes))
+
+            val result = store.copyOriginal(documentId, pageId, DocumentId("doc-2"), PageId("page-2"))
+
+            assertTrue(result.isSuccess)
+            assertArrayEquals(bytes, File(context.filesDir, "documents/doc-2/original/page-2.jpg").readBytes())
+            assertArrayEquals(bytes, original().readBytes())
+        }
+
+    @Test
+    fun `copiar un original que no existe informa origen ilegible`() =
+        runTest {
+            val result = store.copyOriginal(documentId, pageId, DocumentId("doc-2"), PageId("page-2"))
+
+            assertEquals(StorageError.SourceUnreadable, (result.exceptionOrNull() as StorageFailure).error)
+        }
+
+    @Test
     fun `borra la carpeta del documento`() =
         runTest {
             store.saveOriginal(documentId, pageId, sourceFile(byteArrayOf(9)))

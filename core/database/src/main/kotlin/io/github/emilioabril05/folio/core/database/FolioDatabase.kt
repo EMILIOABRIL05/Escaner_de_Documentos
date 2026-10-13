@@ -12,8 +12,10 @@ import androidx.room.RoomDatabase
 abstract class FolioDatabase : RoomDatabase() {
     abstract fun documentDao(): DocumentDao
 
+    abstract fun libraryDao(): LibraryDao
+
     companion object {
-        const val VERSION = 3
+        const val VERSION = 4
         const val NAME = "folio.db"
     }
 }

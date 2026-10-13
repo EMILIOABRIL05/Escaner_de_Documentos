@@ -123,6 +123,16 @@ sealed interface ReviewEffect {
     ) : ReviewEffect
 }
 
+/** Casos de uso que cambian las páginas de un documento en revisión. */
+class ReviewEdits
+    @Inject
+    constructor(
+        val rotatePage: RotatePage,
+        val reorderPages: ReorderPages,
+        val deletePage: DeletePage,
+        val applyFilter: ApplyFilter,
+    )
+
 /** Revisión de un documento: rotar, reordenar, quitar y agregar páginas. */
 @HiltViewModel
 class ReviewViewModel
@@ -131,10 +141,7 @@ class ReviewViewModel
         savedStateHandle: SavedStateHandle,
         private val documents: DocumentRepository,
         private val renderer: PageRenderer,
-        private val rotatePage: RotatePage,
-        private val reorderPages: ReorderPages,
-        private val deletePage: DeletePage,
-        private val applyFilter: ApplyFilter,
+        private val edits: ReviewEdits,
     ) : ViewModel() {
         private val documentId = DocumentId(savedStateHandle.toRoute<ReviewDestination>().documentId)
         private val state = MutableStateFlow<ReviewUiState>(ReviewUiState.Loading)
@@ -166,15 +173,42 @@ class ReviewViewModel
         /** Punto de entrada único de los eventos. */
         fun onEvent(event: ReviewEvent) {
             when (event) {
-                is ReviewEvent.Rotate -> edit { pageOf(event.pageId)?.let { rotatePage(it) } }
-                is ReviewEvent.Move -> move(event.fromIndex, event.toIndex)
-                is ReviewEvent.Delete -> delete(event.pageId)
-                ReviewEvent.UndoDelete -> undoDelete()
-                ReviewEvent.DeleteConfirmed -> confirmDelete()
-                is ReviewEvent.OpenPage -> send(ReviewEffect.EditCrop(documentId, event.pageId))
-                ReviewEvent.AddPages -> send(ReviewEffect.AddPages(documentId))
-                is ReviewEvent.ApplyFilterToAll -> edit { applyFilter(visiblePages().map { it.id }, event.filter) }
-                ReviewEvent.Export -> send(ReviewEffect.Export(documentId))
+                is ReviewEvent.Rotate -> {
+                    edit { pageOf(event.pageId)?.let { edits.rotatePage(it) } }
+                }
+
+                is ReviewEvent.Move -> {
+                    move(event.fromIndex, event.toIndex)
+                }
+
+                is ReviewEvent.Delete -> {
+                    delete(event.pageId)
+                }
+
+                ReviewEvent.UndoDelete -> {
+                    pendingDeletion = null
+                    publish()
+                }
+
+                ReviewEvent.DeleteConfirmed -> {
+                    confirmDelete()
+                }
+
+                is ReviewEvent.OpenPage -> {
+                    send(ReviewEffect.EditCrop(documentId, event.pageId))
+                }
+
+                ReviewEvent.AddPages -> {
+                    send(ReviewEffect.AddPages(documentId))
+                }
+
+                is ReviewEvent.ApplyFilterToAll -> {
+                    edit { edits.applyFilter(visiblePages().map { it.id }, event.filter) }
+                }
+
+                ReviewEvent.Export -> {
+                    send(ReviewEffect.Export(documentId))
+                }
             }
         }
 
@@ -188,7 +222,7 @@ class ReviewViewModel
             val hidden = listOfNotNull(pendingDeletion)
             order = visible + hidden
             publish()
-            edit { reorderPages(documentId, visible + hidden) }
+            edit { edits.reorderPages(documentId, visible + hidden) }
         }
 
         private fun delete(pageId: PageId) {
@@ -197,15 +231,10 @@ class ReviewViewModel
             publish()
         }
 
-        private fun undoDelete() {
-            pendingDeletion = null
-            publish()
-        }
-
         private fun confirmDelete() {
             val pageId = pendingDeletion ?: return
             pendingDeletion = null
-            edit { deletePage(documentId, pageId) }
+            edit { edits.deletePage(documentId, pageId) }
             publish()
         }
 

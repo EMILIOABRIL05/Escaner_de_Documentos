@@ -8,6 +8,7 @@ import androidx.sqlite.execSQL
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,6 +56,23 @@ class MigrationTest {
             assertEquals("p-1 doc-1 4", connection.readPageColumns("id", "documentId", "position"))
             assertEquals(listOf(0.0), connection.readPageNumbers("rotationDegrees"))
             assertEquals("Document", connection.readPageColumns("filter"))
+        }
+    }
+
+    @Test
+    fun `migrar de la versión 3 a la 4 deja los documentos fuera de la papelera`() {
+        helper.createDatabase(3).use { connection ->
+            connection.execSQL(
+                "INSERT INTO documents (id, title, createdAtMillis, updatedAtMillis) VALUES ('doc-1', 'Escaneo', 1, 2)",
+            )
+        }
+
+        helper.runMigrationsAndValidate(4, listOf(Migration3To4)).use { connection ->
+            connection.prepare("SELECT title, trashedAtMillis FROM documents").use { statement ->
+                statement.step()
+                assertEquals("Escaneo", statement.getText(0))
+                assertTrue(statement.isNull(1))
+            }
         }
     }
 

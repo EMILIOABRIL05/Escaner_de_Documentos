@@ -8,9 +8,12 @@ import androidx.navigation.compose.rememberNavController
 import io.github.emilioabril05.folio.core.domain.PhotoCaptureTarget
 import io.github.emilioabril05.folio.engine.api.DocumentScanner
 import io.github.emilioabril05.folio.feature.capture.CaptureDestination
+import io.github.emilioabril05.folio.feature.capture.CaptureNavigation
 import io.github.emilioabril05.folio.feature.capture.CaptureRoute
 import io.github.emilioabril05.folio.feature.export.ExportDestination
 import io.github.emilioabril05.folio.feature.export.ExportRoute
+import io.github.emilioabril05.folio.feature.library.LibraryDestination
+import io.github.emilioabril05.folio.feature.library.LibraryRoute
 import io.github.emilioabril05.folio.feature.review.crop.CropEditorDestination
 import io.github.emilioabril05.folio.feature.review.crop.CropEditorRoute
 import io.github.emilioabril05.folio.feature.review.pages.ReviewDestination
@@ -24,17 +27,40 @@ fun FolioNavHost(
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = CaptureDestination(), modifier = modifier) {
+    NavHost(navController = navController, startDestination = LibraryDestination(), modifier = modifier) {
+        composable<LibraryDestination> {
+            LibraryRoute(
+                onOpenDocument = { documentId -> navController.navigate(ReviewDestination(documentId.value)) },
+                onScan = { navController.navigate(CaptureDestination()) },
+                onOpenTrash = { navController.navigate(LibraryDestination(trash = true)) },
+                onBack = { navController.popBackStack() },
+            )
+        }
         composable<CaptureDestination> {
             CaptureRoute(
                 scanner = scanner,
                 photoTarget = photoTarget,
-                onEditCrop = { documentId, pageId ->
-                    navController.navigate(ReviewDestination(documentId.value))
-                    navController.navigate(CropEditorDestination(documentId.value, pageId.value))
-                },
-                onOpenReview = { documentId -> navController.navigate(ReviewDestination(documentId.value)) },
-                onPagesAdded = { navController.popBackStack() },
+                navigation =
+                    CaptureNavigation(
+                        onEditCrop = { documentId, pageId ->
+                            navController.navigate(ReviewDestination(documentId.value)) {
+                                popUpTo<CaptureDestination> {
+                                    inclusive =
+                                        true
+                                }
+                            }
+                            navController.navigate(CropEditorDestination(documentId.value, pageId.value))
+                        },
+                        onOpenReview = { documentId ->
+                            navController.navigate(ReviewDestination(documentId.value)) {
+                                popUpTo<CaptureDestination> {
+                                    inclusive =
+                                        true
+                                }
+                            }
+                        },
+                        onPagesAdded = { navController.popBackStack() },
+                    ),
             )
         }
         composable<ReviewDestination> {
