@@ -13,7 +13,7 @@ abstract class FolioDatabase : RoomDatabase() {
     abstract fun documentDao(): DocumentDao
 
     companion object {
-        const val VERSION = 1
+        const val VERSION = 2
         const val NAME = "folio.db"
     }
 }

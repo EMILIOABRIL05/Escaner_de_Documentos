@@ -5,6 +5,8 @@ import app.cash.turbine.test
 import io.github.emilioabril05.folio.core.domain.CreateDocumentFromScan
 import io.github.emilioabril05.folio.core.domain.DocumentTitleFormatter
 import io.github.emilioabril05.folio.core.domain.StorageError
+import io.github.emilioabril05.folio.core.model.DocumentId
+import io.github.emilioabril05.folio.core.model.PageId
 import io.github.emilioabril05.folio.core.testing.FakeDocumentRepository
 import io.github.emilioabril05.folio.core.testing.FakePageStore
 import io.github.emilioabril05.folio.core.testing.MainDispatcherRule
@@ -95,6 +97,26 @@ class CaptureViewModelTest {
 
             assertEquals(CaptureUiState.Failed(CaptureFailure.NotEnoughSpace), viewModel.uiState.value)
             assertEquals(emptyList<Any>(), repository.documents)
+        }
+
+    @Test
+    fun `una foto de la cámara del sistema se guarda y abre el recorte`() =
+        runTest {
+            val viewModel = viewModel()
+            val photo = Uri.parse("content://folio.files/captures/foto.jpg")
+
+            viewModel.effects.test {
+                viewModel.onEvent(CaptureEvent.PhotoTaken(photo))
+
+                assertEquals(CaptureEffect.EditCrop(DocumentId("doc-1"), PageId("page-1")), awaitItem())
+            }
+            assertEquals(CaptureUiState.Saved(pageCount = 1), viewModel.uiState.value)
+            assertEquals(
+                1,
+                repository.documents
+                    .single()
+                    .pages.size,
+            )
         }
 
     @Test

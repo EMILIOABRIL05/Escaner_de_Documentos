@@ -24,10 +24,11 @@ class CaptureScreenTest {
     val composeRule = createComposeRule()
 
     private var scans = 0
+    private var cameraUses = 0
 
     private fun show(state: CaptureUiState) {
         composeRule.setContent {
-            FolioTheme { CaptureScreen(uiState = state, onScan = { scans++ }) }
+            FolioTheme { CaptureScreen(uiState = state, onScan = { scans++ }, onUseCamera = { cameraUses++ }) }
         }
     }
 
@@ -59,11 +60,19 @@ class CaptureScreenTest {
     }
 
     @Test
-    fun `sin escáner explica la causa y la solución y permite reintentar`() {
+    fun `sin escáner ofrece usar la cámara del teléfono`() {
         show(CaptureUiState.Failed(CaptureFailure.ScannerUnavailable))
 
         composeRule.onNodeWithText("Este teléfono no tiene el escáner").assertIsDisplayed()
-        composeRule.onNodeWithText("Actualiza Google Play services y vuelve a intentarlo.").assertIsDisplayed()
+        composeRule.onNodeWithText("Usa la cámara del teléfono y ajusta las esquinas a mano.").assertIsDisplayed()
+        composeRule.onNode(hasText("Usar la cámara") and hasClickAction()).performClick()
+        assertEquals(1, cameraUses)
+    }
+
+    @Test
+    fun `sin escáner también permite reintentar`() {
+        show(CaptureUiState.Failed(CaptureFailure.ScannerUnavailable))
+
         composeRule.onNode(hasText("Reintentar") and hasClickAction()).performClick()
         assertEquals(1, scans)
     }

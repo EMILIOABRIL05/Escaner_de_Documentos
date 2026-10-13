@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +34,18 @@ import io.github.emilioabril05.folio.core.designsystem.R as DesignR
 
 private val IllustrationSize = 64.dp
 
-/** Pantalla de captura sin estado: muestra [uiState] y llama a [onScan] para abrir el escáner. */
+/**
+ * Pantalla de captura sin estado: muestra [uiState], llama a [onScan] para abrir el escáner y a [onUseCamera]
+ * para usar la cámara del sistema cuando el escáner no existe en el teléfono.
+ */
 @Composable
 fun CaptureScreen(
     uiState: CaptureUiState,
     onScan: () -> Unit,
+    onUseCamera: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scannerMissing = uiState == CaptureUiState.Failed(CaptureFailure.ScannerUnavailable)
     val content = uiState.content()
     Column(modifier = modifier.fillMaxSize()) {
         Box(
@@ -52,7 +58,17 @@ fun CaptureScreen(
         ) {
             StateMessage(content = content, saving = uiState is CaptureUiState.Saving)
         }
-        if (content.action != null) {
+        if (scannerMissing && content.action != null) {
+            TextButton(
+                onClick = onScan,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = FolioSpacing.m),
+            ) { Text(content.action) }
+            FolioPrimaryButton(
+                text = stringResource(R.string.capture_action_use_camera),
+                onClick = onUseCamera,
+                modifier = Modifier.padding(FolioSpacing.m),
+            )
+        } else if (content.action != null) {
             FolioPrimaryButton(
                 text = content.action,
                 onClick = onScan,

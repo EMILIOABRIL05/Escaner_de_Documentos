@@ -19,11 +19,12 @@
     </plurals>
 
     <string name="capture_error_unavailable_title">Este teléfono no tiene el escáner</string>
-    <string name="capture_error_unavailable_solution">Actualiza Google Play services y vuelve a intentarlo.</string>
+    <string name="capture_error_unavailable_solution">Usa la cámara del teléfono y ajusta las esquinas a mano.</string>
     <string name="capture_error_space_title">No hay espacio para guardar</string>
     <string name="capture_error_space_solution">Libera espacio en el teléfono y vuelve a escanear.</string>
     <string name="capture_error_unreadable_title">No se pudo leer una página</string>
     <string name="capture_error_unreadable_solution">Vuelve a escanear las hojas.</string>
     <string name="capture_error_unknown_title">No se pudo escanear</string>
     <string name="capture_error_unknown_solution">Vuelve a intentarlo.</string>
+    <string name="capture_action_use_camera">Usar la cámara</string>
 </resources>

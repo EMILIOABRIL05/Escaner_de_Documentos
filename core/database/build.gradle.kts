@@ -19,5 +19,15 @@ dependencies {
     ksp(libs.room.compiler)
 
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.room.testing)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+androidComponents {
+    onVariants { variant ->
+        variant.hostTests["UnitTest"]
+            ?.sources
+            ?.assets
+            ?.addStaticSourceDirectory("$projectDir/schemas")
+    }
 }

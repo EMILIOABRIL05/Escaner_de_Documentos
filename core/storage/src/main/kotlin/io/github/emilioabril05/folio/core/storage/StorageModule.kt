@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.emilioabril05.folio.core.domain.PageStore
+import io.github.emilioabril05.folio.core.domain.PhotoCaptureTarget
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
@@ -15,6 +16,9 @@ import kotlinx.coroutines.Dispatchers
 abstract class StorageModule {
     @Binds
     abstract fun bindPageStore(store: FilePageStore): PageStore
+
+    @Binds
+    abstract fun bindPhotoCaptureTarget(target: FileProviderPhotoCaptureTarget): PhotoCaptureTarget
 
     internal companion object {
         @Provides
