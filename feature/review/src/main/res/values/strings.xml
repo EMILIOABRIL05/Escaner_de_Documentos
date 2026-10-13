@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="crop_undo">Deshacer</string>
+    <string name="crop_redo">Rehacer</string>
+    <string name="crop_reset">Restablecer</string>
+    <string name="crop_done">Hecho</string>
+    <string name="crop_preview">Vista previa de la hoja recortada</string>
+    <string name="crop_save_failed">No se pudo guardar el recorte. Vuelve a intentarlo.</string>
+    <string name="crop_open_failed_title">No se pudo abrir la foto</string>
+    <string name="crop_open_failed_solution">Vuelve atrás y escanea la hoja otra vez.</string>
+    <string name="crop_back">Volver</string>
+    <string name="crop_corner_top_left">Esquina superior izquierda</string>
+    <string name="crop_corner_top_right">Esquina superior derecha</string>
+    <string name="crop_corner_bottom_right">Esquina inferior derecha</string>
+    <string name="crop_corner_bottom_left">Esquina inferior izquierda</string>
+    <string name="crop_move_up">Mover hacia arriba</string>
+    <string name="crop_move_down">Mover hacia abajo</string>
+    <string name="crop_move_left">Mover hacia la izquierda</string>
+    <string name="crop_move_right">Mover hacia la derecha</string>
+</resources>
