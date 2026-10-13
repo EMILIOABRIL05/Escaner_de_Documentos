@@ -1,5 +1,6 @@
 package io.github.emilioabril05.folio
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -50,7 +51,19 @@ class AppManifestTest {
         assertEquals("false", cleartextPermitted)
     }
 
+    @Test
+    fun `no registra ningún destino para enviar telemetría de Google`() {
+        val discovery = ComponentName(context, TRANSPORT_BACKEND_DISCOVERY)
+        val metaData =
+            context.packageManager.getServiceInfo(discovery, PackageManager.GET_META_DATA).metaData
+        val backends = metaData?.keySet().orEmpty().filter { it.startsWith(BACKEND_PREFIX) }
+
+        assertEquals(emptyList<String>(), backends)
+    }
+
     private companion object {
+        const val TRANSPORT_BACKEND_DISCOVERY = "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+        const val BACKEND_PREFIX = "backend:"
         const val AD_ID_PERMISSION = "com.google.android.gms.permission.AD_ID"
     }
 }
