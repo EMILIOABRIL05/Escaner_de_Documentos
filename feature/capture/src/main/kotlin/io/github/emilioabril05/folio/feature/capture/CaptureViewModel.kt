@@ -152,10 +152,14 @@ class CaptureViewModel
         // Una sola foto casi nunca viene recortada: se abre también el editor.
         private fun savePhotos(photos: List<Uri>) {
             if (photos.isEmpty()) return
-            save(photos)
+            save(photos, alreadyCropped = false)
         }
 
-        private fun save(pages: List<Uri>) {
+        // Las páginas del escáner ya vienen recortadas: van directo a la revisión.
+        private fun save(
+            pages: List<Uri>,
+            alreadyCropped: Boolean = true,
+        ) {
             state.value = CaptureUiState.Saving(pages.size)
             viewModelScope.launch {
                 val sources = pages.map { PageSource(it.toString()) }
@@ -164,7 +168,9 @@ class CaptureViewModel
                 when (result) {
                     is CreateDocumentResult.Created -> {
                         state.value = CaptureUiState.Saved(result.pageCount)
-                        effectChannel.send(nextStep(result, isNewDocument = target == null))
+                        effectChannel.send(
+                            nextStep(result, isNewDocument = target == null, alreadyCropped = alreadyCropped),
+                        )
                     }
 
                     CreateDocumentResult.NoPages -> {
@@ -181,11 +187,23 @@ class CaptureViewModel
         private fun nextStep(
             created: CreateDocumentResult.Created,
             isNewDocument: Boolean,
+            alreadyCropped: Boolean,
         ): CaptureEffect =
             when {
-                !isNewDocument -> CaptureEffect.PagesAdded
-                created.pageCount == 1 -> CaptureEffect.EditCrop(created.documentId, created.pageIds.first())
-                else -> CaptureEffect.OpenReview(created.documentId)
+                !isNewDocument -> {
+                    CaptureEffect.PagesAdded
+                }
+
+                !alreadyCropped && created.pageCount == 1 -> {
+                    CaptureEffect.EditCrop(
+                        created.documentId,
+                        created.pageIds.first(),
+                    )
+                }
+
+                else -> {
+                    CaptureEffect.OpenReview(created.documentId)
+                }
             }
 
         private fun ScanError.toFailure(): CaptureFailure =
