@@ -13,7 +13,11 @@ import io.github.emilioabril05.folio.core.domain.StorageError
 import io.github.emilioabril05.folio.core.domain.StorageFailure
 import io.github.emilioabril05.folio.core.model.CropQuad
 import io.github.emilioabril05.folio.core.model.DocumentId
+import io.github.emilioabril05.folio.core.model.ExportProfile
+import io.github.emilioabril05.folio.core.model.Page
+import io.github.emilioabril05.folio.core.model.PageFilter
 import io.github.emilioabril05.folio.core.model.PageId
+import io.github.emilioabril05.folio.core.model.Rotation
 import io.github.emilioabril05.folio.core.storage.IoDispatcher
 import io.github.emilioabril05.folio.core.storage.originalFile
 import kotlinx.coroutines.CoroutineDispatcher
@@ -59,6 +63,37 @@ class BitmapPageRenderer
             pageId: PageId,
             crop: CropQuad,
             maxSidePx: Int,
+        ): Result<EncodedImage> = render(documentId, pageId, crop, Rotation.None, PageFilter.Original, maxSidePx)
+
+        override suspend fun page(
+            documentId: DocumentId,
+            page: Page,
+            maxSidePx: Int,
+        ): Result<EncodedImage> = render(documentId, page.id, page.crop, page.rotation, page.filter, maxSidePx)
+
+        override suspend fun export(
+            documentId: DocumentId,
+            page: Page,
+            profile: ExportProfile,
+        ): Result<EncodedImage> =
+            render(
+                documentId = documentId,
+                pageId = page.id,
+                crop = page.crop,
+                rotation = page.rotation,
+                filter = page.filter,
+                maxSidePx = profile.maxSidePx,
+                jpegQuality = profile.jpegQuality,
+            )
+
+        private suspend fun render(
+            documentId: DocumentId,
+            pageId: PageId,
+            crop: CropQuad,
+            rotation: Rotation,
+            filter: PageFilter,
+            maxSidePx: Int,
+            jpegQuality: Int = PREVIEW_JPEG_QUALITY,
         ): Result<EncodedImage> =
             withContext(ioDispatcher) {
                 val file = originalFile(context, documentId, pageId)
@@ -66,11 +101,21 @@ class BitmapPageRenderer
                 if (source == null) {
                     Result.failure(StorageFailure(StorageError.SourceUnreadable))
                 } else {
-                    val page = source.straighten(crop, maxSidePx)
+                    val straight = source.straighten(crop, maxSidePx)
                     source.recycle()
-                    Result.success(page.encode().also { page.recycle() })
+                    val filtered = straight.rotate(rotation).applyFilter(filter)
+                    Result.success(filtered.encode(jpegQuality).also { filtered.recycle() })
                 }
             }
+
+        // Gira en sentido horario; con 90° o 270° el ancho y el alto se intercambian. Libera el bitmap recibido.
+        private fun Bitmap.rotate(rotation: Rotation): Bitmap {
+            if (rotation == Rotation.None) return this
+            val matrix = Matrix().apply { postRotate(rotation.degrees.toFloat()) }
+            val turned = Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
+            if (turned !== this) recycle()
+            return turned
+        }
 
         // Muestreo en potencias de 2: el bitmap decodificado queda entre 1 y 2 veces el tamaño pedido.
         private fun File.decodeForSide(maxSidePx: Int): Bitmap? {
@@ -122,10 +167,10 @@ class BitmapPageRenderer
             return hypot(corners[toX] - corners[fromX], corners[toX + 1] - corners[fromX + 1])
         }
 
-        private fun Bitmap.encode(): EncodedImage {
+        private fun Bitmap.encode(quality: Int = PREVIEW_JPEG_QUALITY): EncodedImage {
             val bytes =
                 ByteArrayOutputStream().use { stream ->
-                    compress(Bitmap.CompressFormat.JPEG, PREVIEW_JPEG_QUALITY, stream)
+                    compress(Bitmap.CompressFormat.JPEG, quality, stream)
                     stream.toByteArray()
                 }
             return EncodedImage(bytes, width, height)

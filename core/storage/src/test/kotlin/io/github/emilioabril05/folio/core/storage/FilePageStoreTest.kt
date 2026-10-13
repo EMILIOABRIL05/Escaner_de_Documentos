@@ -84,6 +84,26 @@ class FilePageStoreTest {
         }
 
     @Test
+    fun `borra solo el original de la página indicada`() =
+        runTest {
+            val otherPage = PageId("page-2")
+            store.saveOriginal(documentId, pageId, sourceFile(byteArrayOf(1)))
+            store.saveOriginal(documentId, otherPage, sourceFile(byteArrayOf(2)))
+
+            val result = store.deleteOriginal(documentId, pageId)
+
+            assertTrue(result.isSuccess)
+            assertFalse(original().exists())
+            assertTrue(File(context.filesDir, "documents/doc-1/original/page-2.jpg").exists())
+        }
+
+    @Test
+    fun `borrar un original inexistente no falla`() =
+        runTest {
+            assertTrue(store.deleteOriginal(documentId, PageId("fantasma")).isSuccess)
+        }
+
+    @Test
     fun `borrar un documento inexistente no falla`() =
         runTest {
             assertTrue(store.deleteDocument(DocumentId("fantasma")).isSuccess)

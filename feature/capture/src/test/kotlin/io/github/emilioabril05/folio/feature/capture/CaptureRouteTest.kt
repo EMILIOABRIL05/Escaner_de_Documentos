@@ -8,8 +8,10 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.SavedStateHandle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.emilioabril05.folio.core.designsystem.theme.FolioTheme
+import io.github.emilioabril05.folio.core.domain.AddPagesToDocument
 import io.github.emilioabril05.folio.core.domain.CreateDocumentFromScan
 import io.github.emilioabril05.folio.core.domain.DocumentTitleFormatter
 import io.github.emilioabril05.folio.core.domain.PageSource
@@ -50,11 +52,18 @@ class CaptureRouteTest {
     fun `si el escáner no se puede abrir la pantalla lo explica`() {
         val viewModel =
             CaptureViewModel(
+                SavedStateHandle(),
                 CreateDocumentFromScan(
                     FakePageStore(),
                     FakeDocumentRepository(),
                     SequentialIdProvider(),
                     DocumentTitleFormatter { it.toString() },
+                    Clock.systemUTC(),
+                ),
+                AddPagesToDocument(
+                    FakePageStore(),
+                    FakeDocumentRepository(),
+                    SequentialIdProvider(),
                     Clock.systemUTC(),
                 ),
             )
@@ -64,6 +73,8 @@ class CaptureRouteTest {
                     scanner = unavailableScanner,
                     photoTarget = { PageSource("content://folio.files/captures/foto.jpg") },
                     onEditCrop = { _, _ -> },
+                    onOpenReview = {},
+                    onPagesAdded = {},
                     viewModel = viewModel,
                 )
             }

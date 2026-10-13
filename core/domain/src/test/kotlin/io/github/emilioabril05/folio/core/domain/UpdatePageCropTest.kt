@@ -1,13 +1,17 @@
 package io.github.emilioabril05.folio.core.domain
 
 import io.github.emilioabril05.folio.core.model.CropQuad
+import io.github.emilioabril05.folio.core.model.Document
+import io.github.emilioabril05.folio.core.model.DocumentId
 import io.github.emilioabril05.folio.core.model.NormalizedPoint
+import io.github.emilioabril05.folio.core.model.Page
 import io.github.emilioabril05.folio.core.model.PageId
 import io.github.emilioabril05.folio.core.testing.FakeDocumentRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Instant
 
 class UpdatePageCropTest {
     private val pageId = PageId("page-1")
@@ -23,6 +27,9 @@ class UpdatePageCropTest {
     fun `guarda un recorte válido`() =
         runTest {
             val repository = FakeDocumentRepository()
+            repository.create(
+                Document(DocumentId("doc-1"), "Escaneo", Instant.EPOCH, Instant.EPOCH, listOf(Page(pageId, 0))),
+            )
 
             val result = UpdatePageCrop(repository)(pageId, tilted)
 

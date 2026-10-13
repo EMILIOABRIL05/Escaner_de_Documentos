@@ -1,9 +1,11 @@
 package io.github.emilioabril05.folio.feature.capture
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.emilioabril05.folio.core.domain.AddPagesToDocument
 import io.github.emilioabril05.folio.core.domain.CreateDocumentFromScan
 import io.github.emilioabril05.folio.core.domain.CreateDocumentResult
 import io.github.emilioabril05.folio.core.domain.PageSource
@@ -73,20 +75,37 @@ sealed interface CaptureEvent {
 
 /** Efectos de una sola vez. */
 sealed interface CaptureEffect {
-    /** Abrir el editor de recorte de la página recién guardada. */
+    /** Abrir la revisión del documento y, encima, el recorte de la página recién guardada. */
     data class EditCrop(
         val documentId: DocumentId,
         val pageId: PageId,
     ) : CaptureEffect
+
+    /** Abrir la revisión del documento recién creado. */
+    data class OpenReview(
+        val documentId: DocumentId,
+    ) : CaptureEffect
+
+    /** Las páginas se agregaron al documento que se estaba revisando: volver a él. */
+    data object PagesAdded : CaptureEffect
 }
 
-/** Recibe el resultado del escáner y guarda las páginas como un documento nuevo. */
+// Clave del argumento de navegación con el documento al que se agregan páginas (ver CaptureDestination).
+internal const val TARGET_DOCUMENT_KEY = "documentId"
+
+/** Recibe el resultado del escáner y guarda las páginas en un documento nuevo o en uno existente. */
 @HiltViewModel
 class CaptureViewModel
     @Inject
     constructor(
+        savedStateHandle: SavedStateHandle,
         private val createDocument: CreateDocumentFromScan,
+        private val addPages: AddPagesToDocument,
     ) : ViewModel() {
+        // Con un documento de destino, las páginas se agregan a él en lugar de crear uno nuevo.
+        private val targetDocument =
+            savedStateHandle.get<String>(TARGET_DOCUMENT_KEY)?.let(::DocumentId)
+
         private val state = MutableStateFlow<CaptureUiState>(CaptureUiState.Idle)
 
         private val effectChannel = Channel<CaptureEffect>(Channel.BUFFERED)
@@ -130,26 +149,22 @@ class CaptureViewModel
             }
         }
 
-        // Una sola foto casi nunca viene recortada: se abre el editor. Varias se revisan después (RF-04).
+        // Una sola foto casi nunca viene recortada: se abre también el editor.
         private fun savePhotos(photos: List<Uri>) {
             if (photos.isEmpty()) return
-            save(photos) { created ->
-                if (created.pageCount == 1) {
-                    effectChannel.send(CaptureEffect.EditCrop(created.documentId, created.pageIds.first()))
-                }
-            }
+            save(photos)
         }
 
-        private fun save(
-            pages: List<Uri>,
-            onCreated: suspend (CreateDocumentResult.Created) -> Unit = {},
-        ) {
+        private fun save(pages: List<Uri>) {
             state.value = CaptureUiState.Saving(pages.size)
             viewModelScope.launch {
-                when (val result = createDocument(pages.map { PageSource(it.toString()) })) {
+                val sources = pages.map { PageSource(it.toString()) }
+                val target = targetDocument
+                val result = if (target == null) createDocument(sources) else addPages(target, sources)
+                when (result) {
                     is CreateDocumentResult.Created -> {
                         state.value = CaptureUiState.Saved(result.pageCount)
-                        onCreated(result)
+                        effectChannel.send(nextStep(result, isNewDocument = target == null))
                     }
 
                     CreateDocumentResult.NoPages -> {
@@ -162,6 +177,16 @@ class CaptureViewModel
                 }
             }
         }
+
+        private fun nextStep(
+            created: CreateDocumentResult.Created,
+            isNewDocument: Boolean,
+        ): CaptureEffect =
+            when {
+                !isNewDocument -> CaptureEffect.PagesAdded
+                created.pageCount == 1 -> CaptureEffect.EditCrop(created.documentId, created.pageIds.first())
+                else -> CaptureEffect.OpenReview(created.documentId)
+            }
 
         private fun ScanError.toFailure(): CaptureFailure =
             when (this) {

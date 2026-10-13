@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.folio.android.library)
+    alias(libs.plugins.folio.hilt)
 }
 
 android {
@@ -8,4 +9,5 @@ android {
 
 dependencies {
     implementation(projects.core.domain)
+    implementation(libs.androidx.core.ktx)
 }

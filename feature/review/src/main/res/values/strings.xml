@@ -17,4 +17,25 @@
     <string name="crop_move_down">Mover hacia abajo</string>
     <string name="crop_move_left">Mover hacia la izquierda</string>
     <string name="crop_move_right">Mover hacia la derecha</string>
+    <string name="review_back">Volver</string>
+    <string name="review_missing">Este documento ya no existe.</string>
+    <string name="review_edit_failed">No se pudo guardar el cambio. Vuelve a intentarlo.</string>
+    <string name="review_page_description">Página %1$d de %2$d. Toca para recortar</string>
+    <string name="review_move_before">Mover antes</string>
+    <string name="review_move_after">Mover después</string>
+    <string name="review_rotate_page">Girar página %1$d</string>
+    <string name="review_delete_page">Eliminar página %1$d</string>
+    <string name="review_add_pages">Añadir páginas</string>
+    <string name="review_page_deleted">Página eliminada</string>
+    <string name="review_undo">Deshacer</string>
+    <string name="review_send_pdf">Enviar PDF</string>
+    <string name="review_filter_original">Original</string>
+    <string name="review_filter_document">Documento</string>
+    <string name="review_filter_grayscale">Grises</string>
+    <string name="review_filter_color">Color</string>
+    <plurals name="review_page_count">
+        <item quantity="one">%d página</item>
+        <item quantity="many">%d páginas</item>
+        <item quantity="other">%d páginas</item>
+    </plurals>
 </resources>

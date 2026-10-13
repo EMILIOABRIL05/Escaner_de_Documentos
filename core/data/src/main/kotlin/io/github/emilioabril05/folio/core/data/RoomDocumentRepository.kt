@@ -9,8 +9,14 @@ import io.github.emilioabril05.folio.core.domain.StorageError
 import io.github.emilioabril05.folio.core.domain.StorageFailure
 import io.github.emilioabril05.folio.core.model.CropQuad
 import io.github.emilioabril05.folio.core.model.Document
+import io.github.emilioabril05.folio.core.model.DocumentId
 import io.github.emilioabril05.folio.core.model.Page
+import io.github.emilioabril05.folio.core.model.PageFilter
 import io.github.emilioabril05.folio.core.model.PageId
+import io.github.emilioabril05.folio.core.model.Rotation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import java.time.Instant
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -32,6 +38,53 @@ class RoomDocumentRepository
             guarded {
                 val updatedRows = dao.updatePageCrop(PageCropUpdate(pageId.value, crop.toColumns()))
                 if (updatedRows == 0) throw PageNotFoundException()
+            }
+
+        override fun observeDocument(documentId: DocumentId): Flow<Document?> =
+            combine(
+                dao.observeDocument(documentId.value),
+                dao.observePagesInOrder(documentId.value),
+            ) { document, pages -> document?.toDocument(pages) }
+
+        override suspend fun updatePageRotation(
+            pageId: PageId,
+            rotation: Rotation,
+        ): Result<Unit> =
+            guarded {
+                val updatedRows = dao.updatePageRotation(pageId.value, rotation.degrees)
+                if (updatedRows == 0) throw PageNotFoundException()
+            }
+
+        override suspend fun updatePageFilter(
+            pageIds: List<PageId>,
+            filter: PageFilter,
+        ): Result<Unit> =
+            guarded {
+                if (pageIds.isNotEmpty() && dao.updatePagesFilter(pageIds.map { it.value }, filter.name) == 0) {
+                    throw PageNotFoundException()
+                }
+            }
+
+        override suspend fun reorderPages(
+            documentId: DocumentId,
+            pageIds: List<PageId>,
+        ): Result<Unit> = guarded { dao.reorderPages(documentId.value, pageIds.map { it.value }) }
+
+        override suspend fun deletePage(pageId: PageId): Result<Unit> =
+            guarded {
+                if (dao.deletePageAndShift(pageId.value) == 0) throw PageNotFoundException()
+            }
+
+        override suspend fun addPages(
+            documentId: DocumentId,
+            pages: List<Page>,
+            updatedAt: Instant,
+        ): Result<Unit> =
+            guarded {
+                val entities = pages.map { it.toEntity(documentId.value) }
+                if (dao.appendPages(documentId.value, entities, updatedAt.toEpochMilli()) == 0) {
+                    throw PageNotFoundException()
+                }
             }
 
         private suspend fun <T> guarded(block: suspend () -> T): Result<T> =

@@ -6,9 +6,13 @@ import io.github.emilioabril05.folio.core.database.PageEntity
 import io.github.emilioabril05.folio.core.database.PointColumns
 import io.github.emilioabril05.folio.core.model.CropQuad
 import io.github.emilioabril05.folio.core.model.Document
+import io.github.emilioabril05.folio.core.model.DocumentId
 import io.github.emilioabril05.folio.core.model.NormalizedPoint
 import io.github.emilioabril05.folio.core.model.Page
+import io.github.emilioabril05.folio.core.model.PageFilter
 import io.github.emilioabril05.folio.core.model.PageId
+import io.github.emilioabril05.folio.core.model.Rotation
+import java.time.Instant
 
 internal fun Document.toEntity() =
     DocumentEntity(
@@ -18,12 +22,32 @@ internal fun Document.toEntity() =
         updatedAtMillis = updatedAt.toEpochMilli(),
     )
 
-internal fun Document.toPageEntities() =
-    pages.map {
-        PageEntity(id = it.id.value, documentId = id.value, position = it.position, crop = it.crop.toColumns())
-    }
+internal fun Document.toPageEntities() = pages.map { it.toEntity(id.value) }
 
-internal fun PageEntity.toPage() = Page(id = PageId(id), position = position, crop = crop.toCropQuad())
+internal fun Page.toEntity(documentId: String) =
+    PageEntity(
+        id = id.value,
+        documentId = documentId,
+        position = position,
+        crop = crop.toColumns(),
+        rotationDegrees = rotation.degrees,
+        filter = filter.name,
+    )
+
+internal fun PageEntity.toPage() =
+    Page(
+        id = PageId(id),
+        position = position,
+        crop = crop.toCropQuad(),
+        rotation = rotationDegrees.toRotation(),
+        filter = filter.toPageFilter(),
+    )
+
+// Un nombre de filtro desconocido se trata como el filtro por defecto.
+private fun String.toPageFilter() = PageFilter.entries.firstOrNull { it.name == this } ?: PageFilter.Document
+
+// Un valor guardado que no sea múltiplo de 90° se trata como sin giro.
+private fun Int.toRotation() = Rotation.entries.firstOrNull { it.degrees == this } ?: Rotation.None
 
 internal fun CropQuad.toColumns() =
     CropColumns(

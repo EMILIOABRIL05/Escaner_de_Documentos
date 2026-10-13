@@ -33,4 +33,12 @@ class FakePageStore(
         savedOriginals.entries.removeAll { it.value.first == documentId }
         return Result.success(Unit)
     }
+
+    override suspend fun deleteOriginal(
+        documentId: DocumentId,
+        pageId: PageId,
+    ): Result<Unit> {
+        savedOriginals.remove(pageId)
+        return Result.success(Unit)
+    }
 }

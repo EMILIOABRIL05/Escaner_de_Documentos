@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteFullException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import app.cash.turbine.test
 import io.github.emilioabril05.folio.core.database.DocumentDao
 import io.github.emilioabril05.folio.core.database.DocumentEntity
 import io.github.emilioabril05.folio.core.database.DocumentWithPages
@@ -18,7 +19,12 @@ import io.github.emilioabril05.folio.core.model.Document
 import io.github.emilioabril05.folio.core.model.DocumentId
 import io.github.emilioabril05.folio.core.model.NormalizedPoint
 import io.github.emilioabril05.folio.core.model.Page
+import io.github.emilioabril05.folio.core.model.PageFilter
 import io.github.emilioabril05.folio.core.model.PageId
+import io.github.emilioabril05.folio.core.model.Rotation
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -163,6 +169,162 @@ class RoomDocumentRepositoryTest {
         }
 
     @Test
+    fun `guarda el giro de cada página al crear el documento`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document(pages = listOf(Page(PageId("p-0"), 0, rotation = Rotation.Half))))
+
+            assertEquals(Rotation.Half, repository.findPage(PageId("p-0")).getOrNull()?.rotation)
+        }
+
+    @Test
+    fun `guarda el filtro de varias páginas y deja el resto con el filtro por defecto`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document())
+
+            val result = repository.updatePageFilter(listOf(PageId("p-0"), PageId("p-2")), PageFilter.Grayscale)
+
+            val pages = repository.observeDocument(DocumentId("doc-1")).first()?.pages
+            assertTrue(result.isSuccess)
+            assertEquals(
+                listOf(PageFilter.Grayscale, PageFilter.Document, PageFilter.Grayscale),
+                pages?.map { it.filter },
+            )
+        }
+
+    @Test
+    fun `informa error desconocido al filtrar páginas que no existen`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+
+            val result = repository.updatePageFilter(listOf(PageId("no-existe")), PageFilter.Original)
+
+            assertEquals(StorageError.Unknown, (result.exceptionOrNull() as StorageFailure).error)
+        }
+
+    @Test
+    fun `observa el documento con sus páginas en orden`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document())
+
+            val observed = repository.observeDocument(DocumentId("doc-1")).first()
+
+            assertEquals(document(), observed)
+        }
+
+    @Test
+    fun `observar un documento que no existe emite nulo`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+
+            assertNull(repository.observeDocument(DocumentId("fantasma")).first())
+        }
+
+    @Test
+    fun `observar el documento emite de nuevo tras cambiar el giro de una página`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document())
+
+            repository.observeDocument(DocumentId("doc-1")).test {
+                assertEquals(Rotation.None, awaitItem()?.pages?.first()?.rotation)
+
+                repository.updatePageRotation(PageId("p-0"), Rotation.Quarter)
+
+                assertEquals(Rotation.Quarter, awaitItem()?.pages?.first()?.rotation)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `informa error desconocido al girar una página que no existe`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+
+            val result = repository.updatePageRotation(PageId("no-existe"), Rotation.Half)
+
+            assertEquals(StorageError.Unknown, (result.exceptionOrNull() as StorageFailure).error)
+        }
+
+    @Test
+    fun `reordena las páginas y sus posiciones pasan a ser 0, 1, 2`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document())
+
+            val result =
+                repository.reorderPages(
+                    DocumentId("doc-1"),
+                    listOf(PageId("p-2"), PageId("p-0"), PageId("p-1")),
+                )
+
+            val pages = repository.observeDocument(DocumentId("doc-1")).first()?.pages
+            assertTrue(result.isSuccess)
+            assertEquals(listOf("p-2", "p-0", "p-1"), pages?.map { it.id.value })
+            assertEquals(listOf(0, 1, 2), pages?.map { it.position })
+        }
+
+    @Test
+    fun `borrar una página sube las siguientes una posición`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document())
+
+            val result = repository.deletePage(PageId("p-0"))
+
+            val pages = repository.observeDocument(DocumentId("doc-1")).first()?.pages
+            assertTrue(result.isSuccess)
+            assertEquals(listOf("p-1", "p-2"), pages?.map { it.id.value })
+            assertEquals(listOf(0, 1), pages?.map { it.position })
+        }
+
+    @Test
+    fun `informa error desconocido al borrar una página que no existe`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+
+            val result = repository.deletePage(PageId("no-existe"))
+
+            assertEquals(StorageError.Unknown, (result.exceptionOrNull() as StorageFailure).error)
+        }
+
+    @Test
+    fun `agrega páginas al final en su orden y actualiza la fecha del documento`() =
+        runTest {
+            val repository = RoomDocumentRepository(database.documentDao())
+            repository.create(document())
+            val added = listOf(Page(PageId("n-0"), 0, CROP), Page(PageId("n-1"), 1, rotation = Rotation.Half))
+
+            val result = repository.addPages(DocumentId("doc-1"), added, LATER)
+
+            val saved = repository.observeDocument(DocumentId("doc-1")).first()
+            assertTrue(result.isSuccess)
+            assertEquals(listOf("p-0", "p-1", "p-2", "n-0", "n-1"), saved?.pages?.map { it.id.value })
+            assertEquals(listOf(0, 1, 2, 3, 4), saved?.pages?.map { it.position })
+            assertEquals(CROP, saved?.pages?.get(3)?.crop)
+            assertEquals(Rotation.Half, saved?.pages?.get(4)?.rotation)
+            assertEquals(LATER, saved?.updatedAt)
+        }
+
+    @Test
+    fun `informa error desconocido ante un fallo de sqlite al editar páginas`() =
+        runTest {
+            val repository = RoomDocumentRepository(FailingDocumentDao(SQLiteException("boom")))
+
+            val results =
+                listOf(
+                    repository.updatePageRotation(PageId("p-1"), Rotation.Half),
+                    repository.reorderPages(DocumentId("doc-1"), listOf(PageId("p-1"))),
+                    repository.deletePage(PageId("p-1")),
+                    repository.addPages(DocumentId("doc-1"), listOf(Page(PageId("n-0"), 0)), LATER),
+                )
+
+            results.forEach { assertEquals(StorageError.Unknown, (it.exceptionOrNull() as StorageFailure).error) }
+        }
+
+    @Test
     fun `los identificadores generados son distintos`() {
         val ids = UuidIdProvider()
 
@@ -201,12 +363,60 @@ class RoomDocumentRepositoryTest {
 
         override suspend fun updatePageCrop(update: PageCropUpdate): Int = throw failure
 
+        override suspend fun updatePageRotation(
+            pageId: String,
+            rotationDegrees: Int,
+        ): Int = throw failure
+
+        override fun observeDocument(documentId: String): Flow<DocumentEntity?> = flow { throw failure }
+
+        override fun observePagesInOrder(documentId: String): Flow<List<PageEntity>> = flow { throw failure }
+
+        override suspend fun updatePagePosition(
+            documentId: String,
+            pageId: String,
+            position: Int,
+        ) = throw failure
+
+        override suspend fun reorderPages(
+            documentId: String,
+            pageIds: List<String>,
+        ) = throw failure
+
+        override suspend fun updatePagesFilter(
+            pageIds: List<String>,
+            filter: String,
+        ): Int = throw failure
+
+        override suspend fun deletePage(pageId: String): Int = throw failure
+
+        override suspend fun shiftPagesUp(
+            documentId: String,
+            position: Int,
+        ) = throw failure
+
+        override suspend fun deletePageAndShift(pageId: String): Int = throw failure
+
+        override suspend fun findLastPosition(documentId: String): Int? = throw failure
+
+        override suspend fun updateDocumentUpdatedAt(
+            documentId: String,
+            updatedAtMillis: Long,
+        ): Int = throw failure
+
+        override suspend fun appendPages(
+            documentId: String,
+            pages: List<PageEntity>,
+            updatedAtMillis: Long,
+        ): Int = throw failure
+
         override suspend fun count(): Int = throw failure
     }
 
     private companion object {
         val CREATED: Instant = Instant.ofEpochMilli(1_000L)
         val UPDATED: Instant = Instant.ofEpochMilli(2_000L)
+        val LATER: Instant = Instant.ofEpochMilli(9_000L)
         val CROP =
             CropQuad(
                 topLeft = NormalizedPoint(0.1f, 0.2f),

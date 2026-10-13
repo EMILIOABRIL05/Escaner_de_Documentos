@@ -7,6 +7,12 @@
         android:name="com.google.android.gms.permission.AD_ID"
         tools:node="remove" />
 
+    <!-- Para mostrar el botón directo de WhatsApp solo si está instalado (Android 11+). -->
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+    </queries>
+
     <application
         android:name=".FolioApplication"
         android:allowBackup="false"
