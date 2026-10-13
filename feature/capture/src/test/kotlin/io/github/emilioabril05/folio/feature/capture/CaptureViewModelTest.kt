@@ -164,6 +164,18 @@ class CaptureViewModelTest {
         }
 
     @Test
+    fun `una sola página escaneada va directo a la revisión sin abrir el recorte`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.effects.test {
+                viewModel.onEvent(CaptureEvent.ScanFinished(ScanOutcome.Success(pages.take(1))))
+
+                assertEquals(CaptureEffect.OpenReview(DocumentId("doc-1")), awaitItem())
+            }
+        }
+
+    @Test
     fun `al cerrar el mensaje vuelve a estar listo`() =
         runTest {
             val viewModel = viewModel()

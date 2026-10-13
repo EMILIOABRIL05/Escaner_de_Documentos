@@ -6,6 +6,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Sin publicar]
 
+## [1.0.0] - 2026-10-13
+
 ### Añadido
 
 - La app se llama APUNT y tiene su propio ícono.
