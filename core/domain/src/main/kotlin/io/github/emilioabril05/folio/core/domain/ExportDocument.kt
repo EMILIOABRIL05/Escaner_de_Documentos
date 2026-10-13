@@ -92,6 +92,6 @@ internal fun pdfFileName(title: String): String {
             .trim()
             .replace(Regex("""[^\p{L}\p{N}]+"""), "-")
             .trim('-')
-            .ifEmpty { "Folio" }
+            .ifEmpty { "APUNT" }
     return "$safe.pdf"
 }

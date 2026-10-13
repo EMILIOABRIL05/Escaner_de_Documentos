@@ -7,7 +7,7 @@ android {
     namespace = "io.github.emilioabril05.folio"
 
     defaultConfig {
-        applicationId = "io.github.emilioabril05.folio"
+        applicationId = "io.github.emilioabril05.apunt"
         versionCode = 1
         versionName = "0.0.1"
     }
