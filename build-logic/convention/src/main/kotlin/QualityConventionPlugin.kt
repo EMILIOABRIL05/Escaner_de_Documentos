@@ -1,3 +1,4 @@
+import io.github.emilioabril05.folio.buildlogic.excludeGeneratedCodeFromCoverage
 import io.github.emilioabril05.folio.buildlogic.libs
 import io.github.emilioabril05.folio.buildlogic.library
 import io.github.emilioabril05.folio.buildlogic.pluginId
@@ -19,6 +20,7 @@ class QualityConventionPlugin : Plugin<Project> {
             pluginManager.apply(libs.pluginId("ktlint"))
             pluginManager.apply(libs.pluginId("detekt"))
             pluginManager.apply(libs.pluginId("kover"))
+            excludeGeneratedCodeFromCoverage()
 
             extensions.configure<KtlintExtension> {
                 version.set(libs.findVersion("ktlint").get().requiredVersion)

@@ -113,3 +113,4 @@ folio-android-feature = { id = "folio.android.feature" }
 folio-jvm-library = { id = "folio.jvm.library" }
 folio-hilt = { id = "folio.hilt" }
 folio-quality = { id = "folio.quality" }
+folio-coverage = { id = "folio.coverage" }
