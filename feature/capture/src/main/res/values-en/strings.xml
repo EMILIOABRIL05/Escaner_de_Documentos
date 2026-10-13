@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="capture_idle_title">Scan your first page</string>
+    <string name="capture_idle_tip">Place the page on a dark surface with good light.</string>
+    <string name="capture_action_scan">Scan</string>
+    <string name="capture_action_scan_again">Scan again</string>
+    <string name="capture_action_retry">Try again</string>
+    <string name="capture_saved_message">You can keep scanning.</string>
+
+    <plurals name="capture_saving_title">
+        <item quantity="one">Saving %d page…</item>
+        <item quantity="other">Saving %d pages…</item>
+    </plurals>
+    <plurals name="capture_saved_title">
+        <item quantity="one">%d page saved</item>
+        <item quantity="other">%d pages saved</item>
+    </plurals>
+
+    <string name="capture_error_unavailable_title">This phone doesn\'t have the scanner</string>
+    <string name="capture_error_unavailable_solution">Use the phone camera and adjust the corners by hand.</string>
+    <string name="capture_error_space_title">Not enough space to save</string>
+    <string name="capture_error_space_solution">Free up space on your phone and scan again.</string>
+    <string name="capture_error_unreadable_title">A page couldn\'t be read</string>
+    <string name="capture_error_unreadable_solution">Scan the pages again.</string>
+    <string name="capture_error_unknown_title">Couldn\'t scan</string>
+    <string name="capture_error_unknown_solution">Try again.</string>
+    <string name="capture_action_use_camera">Use the camera</string>
+    <string name="capture_action_import">From gallery</string>
+</resources>

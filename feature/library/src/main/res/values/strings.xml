@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_title">Documentos</string>
+    <string name="library_trash_title">Papelera</string>
+    <string name="library_scan">Escanear</string>
+    <string name="library_search">Buscar por título</string>
+    <string name="library_open_trash">Abrir la papelera</string>
+    <string name="library_back">Volver</string>
+    <string name="library_trash_hint">Los documentos se borran para siempre a los %1$d días.</string>
+    <string name="library_empty">Escanea tu primera hoja</string>
+    <string name="library_no_results">No hay documentos con ese título</string>
+    <string name="library_trash_empty">La papelera está vacía</string>
+    <string name="library_group_today">Hoy</string>
+    <string name="library_group_week">Esta semana</string>
+    <string name="library_group_earlier">Anteriores</string>
+    <string name="library_more_actions">Más acciones para %1$s</string>
+    <string name="library_rename">Renombrar</string>
+    <string name="library_duplicate">Duplicar</string>
+    <string name="library_move_to_trash">Enviar a la papelera</string>
+    <string name="library_copy_title">%1$s (copia)</string>
+    <string name="library_restore">Restaurar %1$s</string>
+    <string name="library_delete_forever_named">Eliminar %1$s para siempre</string>
+    <string name="library_delete_forever">Eliminar para siempre</string>
+    <string name="library_delete_forever_title">¿Eliminar para siempre?</string>
+    <string name="library_delete_forever_message">"%1$s" se borrará con todas sus páginas. No se puede deshacer.</string>
+    <string name="library_cancel">Cancelar</string>
+    <string name="library_save">Guardar</string>
+    <string name="library_trashed">Documento enviado a la papelera</string>
+    <string name="library_undo">Deshacer</string>
+    <string name="library_edit_failed">No se pudo guardar el cambio. Vuelve a intentarlo.</string>
+    <plurals name="library_pages">
+        <item quantity="one">%d página</item>
+        <item quantity="many">%d páginas</item>
+        <item quantity="other">%d páginas</item>
+    </plurals>
+</resources>

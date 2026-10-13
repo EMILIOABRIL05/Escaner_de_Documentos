@@ -1,0 +1,165 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "2f3617493bc9f49818ce4f8d6769759c",
+    "entities": [
+      {
+        "tableName": "documents",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `createdAtMillis` INTEGER NOT NULL, `updatedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtMillis",
+            "columnName": "createdAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAtMillis",
+            "columnName": "updatedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "pages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `documentId` TEXT NOT NULL, `position` INTEGER NOT NULL, `rotationDegrees` INTEGER NOT NULL DEFAULT 0, `filter` TEXT NOT NULL DEFAULT 'Document', `cropTopLeftX` REAL NOT NULL, `cropTopLeftY` REAL NOT NULL, `cropTopRightX` REAL NOT NULL, `cropTopRightY` REAL NOT NULL, `cropBottomRightX` REAL NOT NULL, `cropBottomRightY` REAL NOT NULL, `cropBottomLeftX` REAL NOT NULL, `cropBottomLeftY` REAL NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`documentId`) REFERENCES `documents`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "documentId",
+            "columnName": "documentId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rotationDegrees",
+            "columnName": "rotationDegrees",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "filter",
+            "columnName": "filter",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Document'"
+          },
+          {
+            "fieldPath": "crop.topLeft.x",
+            "columnName": "cropTopLeftX",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.topLeft.y",
+            "columnName": "cropTopLeftY",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.topRight.x",
+            "columnName": "cropTopRightX",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.topRight.y",
+            "columnName": "cropTopRightY",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.bottomRight.x",
+            "columnName": "cropBottomRightX",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.bottomRight.y",
+            "columnName": "cropBottomRightY",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.bottomLeft.x",
+            "columnName": "cropBottomLeftX",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "crop.bottomLeft.y",
+            "columnName": "cropBottomLeftY",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pages_documentId",
+            "unique": false,
+            "columnNames": [
+              "documentId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pages_documentId` ON `${TABLE_NAME}` (`documentId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "documents",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "documentId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2f3617493bc9f49818ce4f8d6769759c')"
+    ]
+  }
+}

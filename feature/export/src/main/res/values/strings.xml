@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="export_title">Enviar PDF</string>
+    <string name="export_close">Cerrar</string>
+    <string name="export_quality">Calidad</string>
+    <string name="export_save">Guardar en el teléfono</string>
+    <string name="export_whatsapp">Enviar por WhatsApp</string>
+    <string name="export_share">Compartir</string>
+    <string name="export_estimating">Calculando…</string>
+    <string name="export_estimate">~%1$s</string>
+    <string name="export_profile_light">Ligero</string>
+    <string name="export_profile_light_hint">Para WhatsApp y correo</string>
+    <string name="export_profile_balanced">Equilibrado</string>
+    <string name="export_profile_balanced_hint">Buena calidad, peso moderado</string>
+    <string name="export_profile_high">Alta</string>
+    <string name="export_profile_high_hint">Para imprimir o archivar</string>
+    <string name="export_error_space">No hay espacio para crear el PDF. Libera espacio o usa Ligero.</string>
+    <string name="export_error_empty">Este documento no tiene páginas.</string>
+    <string name="export_error_unknown">No se pudo crear el PDF. Vuelve a intentarlo.</string>
+</resources>

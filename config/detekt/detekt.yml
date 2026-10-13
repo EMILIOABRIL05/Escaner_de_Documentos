@@ -1,0 +1,147 @@
+# Se construye sobre la configuración por defecto de detekt.
+# Umbrales de CLAUDE.md §4: complejidad ≤ 15, función ≤ 60 líneas, clase ≤ 600 líneas, ≤ 6 parámetros.
+
+complexity:
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 15
+  LongMethod:
+    active: true
+    threshold: 60
+  LargeClass:
+    active: true
+    threshold: 600
+  LongParameterList:
+    active: true
+    # detekt avisa al llegar al umbral: 7 permite hasta 6 parámetros.
+    functionThreshold: 7
+    constructorThreshold: 7
+    ignoreDefaultParameters: false
+
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: true
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+  ForbiddenClassName:
+    active: true
+    forbiddenName: ['*Manager', '*Helper', '*Utils', '*Util']
+
+style:
+  ForbiddenComment:
+    active: true
+    comments:
+      - value: 'TODO'
+        reason: 'Todo TODO necesita un issue asociado: TODO(#123).'
+      - value: 'FIXME'
+        reason: 'Corrige el problema o abre un issue.'
+      - value: 'STOPSHIP'
+        reason: 'No puede llegar a una rama compartida.'
+    allowedPatterns: 'TODO\(#\d+\)'
+  MagicNumber:
+    active: true
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotated: ['Preview']
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated: ['Preview']
+
+# Reglas de Compose: configuración recomendada de io.nlopez.compose.rules 0.6.8.
+Compose:
+  ComposableAnnotationNaming:
+    active: true
+  ComposableNaming:
+    active: true
+  ComposableNestingDepth:
+    active: false
+  ComposableParamOrder:
+    active: true
+  CompositionLocalAllowlist:
+    active: true
+  CompositionLocalNaming:
+    active: true
+  ConditionHoist:
+    active: true
+  ContentEmitterReturningValues:
+    active: true
+  ContentSlotReused:
+    active: true
+  ContentTrailingLambda:
+    active: true
+  DefaultsVisibility:
+    active: true
+  InvalidReadOnlyComposable:
+    active: true
+  LambdaParameterEventTrailing:
+    active: true
+  LambdaParameterInRestartableEffect:
+    active: true
+  Material2:
+    active: false
+  MissingNonRestartableComposable:
+    active: true
+    # -- Ignore direct and custom @Preview composables (default: true)
+    # ignoresPreviews: true
+  MissingReadOnlyComposable:
+    active: true
+  ModifierClickableOrder:
+    active: true
+  ModifierComposed:
+    active: true
+  ModifierMissing:
+    active: true
+  ModifierNaming:
+    active: true
+  ModifierNotUsedAtRoot:
+    active: true
+  ModifierReused:
+    active: true
+  ModifierShouldBeForwardedToEveryBranch:
+    active: true
+  ModifierWithoutDefault:
+    active: true
+  MultipleEmitters:
+    active: true
+  MutableParams:
+    active: true
+  MutableStateAutoboxing:
+    active: true
+  MutableStateParam:
+    active: true
+  ParameterNaming:
+    active: true
+  PreviewAnnotationNaming:
+    active: true
+  PreviewNaming:
+    active: false
+  PreviewPublic:
+    active: true
+  RememberContentMissing:
+    active: true
+  RememberMissing:
+    active: true
+  StaleRememberUpdatedStateInRemember:
+    active: true
+  StateParam:
+    active: true
+  UnnecessaryComposable:
+    active: true
+  UnnecessaryLaunchedEffect:
+    active: true
+    # -- Calls whose dispatch or extension receiver has one of these fully qualified types keep LaunchedEffect.
+    # allowedCallReceiverTypes:
+    #   - androidx.compose.ui.focus.FocusRequester
+    # -- Calls whose fully qualified name is listed here keep LaunchedEffect.
+    # allowedCallNames:
+    #   - androidx.compose.ui.focus.FocusRequester.requestFocus
+  UnstableCollections:
+    active: false
+  VarsWithoutStateBacking:
+    active: true
+  ViewModelForwarding:
+    active: true
+  ViewModelInjection:
+    active: true
