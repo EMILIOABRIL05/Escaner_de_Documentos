@@ -62,7 +62,8 @@ class AppManifestTest {
     }
 
     private companion object {
-        const val TRANSPORT_BACKEND_DISCOVERY = "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+        const val TRANSPORT_BACKENDS_PACKAGE = "com.google.android.datatransport.runtime.backends"
+        const val TRANSPORT_BACKEND_DISCOVERY = "$TRANSPORT_BACKENDS_PACKAGE.TransportBackendDiscovery"
         const val BACKEND_PREFIX = "backend:"
         const val AD_ID_PERMISSION = "com.google.android.gms.permission.AD_ID"
     }

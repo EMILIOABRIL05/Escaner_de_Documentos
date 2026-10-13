@@ -18,15 +18,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Folio">
 
-        <!-- ML Kit envía telemetría de uso a Google por esta vía. Sin backend, no tiene a dónde enviarla (RNF-09). -->
-        <service
-            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
-            android:exported="false">
-            <meta-data
-                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
-                tools:node="remove" />
-        </service>
-
         <activity
             android:name=".MainActivity"
             android:exported="true">
