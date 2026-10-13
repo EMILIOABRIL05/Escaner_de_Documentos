@@ -29,7 +29,7 @@ class FilePageStore
             source: PageSource,
         ): Result<Unit> =
             withContext(ioDispatcher) {
-                val target = originalFile(documentId, pageId)
+                val target = originalFile(context, documentId, pageId)
                 val input = openSource(source)
                 if (input == null) {
                     Result.failure(StorageFailure(StorageError.SourceUnreadable))
@@ -40,7 +40,7 @@ class FilePageStore
 
         override suspend fun deleteDocument(documentId: DocumentId): Result<Unit> =
             withContext(ioDispatcher) {
-                if (documentDirectory(documentId).deleteRecursively()) {
+                if (documentDirectory(context, documentId).deleteRecursively()) {
                     Result.success(Unit)
                 } else {
                     Result.failure(StorageFailure(StorageError.Unknown))
@@ -70,18 +70,4 @@ class FilePageStore
                 target.delete()
                 Result.failure(StorageFailure(error.toStorageError()))
             }
-
-        private fun documentDirectory(documentId: DocumentId) =
-            File(File(context.filesDir, DOCUMENTS_DIRECTORY), documentId.value)
-
-        private fun originalFile(
-            documentId: DocumentId,
-            pageId: PageId,
-        ) = File(File(documentDirectory(documentId), ORIGINAL_DIRECTORY), pageId.value + ORIGINAL_EXTENSION)
-
-        private companion object {
-            const val DOCUMENTS_DIRECTORY = "documents"
-            const val ORIGINAL_DIRECTORY = "original"
-            const val ORIGINAL_EXTENSION = ".jpg"
-        }
     }
