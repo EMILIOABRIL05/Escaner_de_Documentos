@@ -58,7 +58,7 @@ class FilePageStore
                 null
             }
 
-        private fun copyOrCleanUp(
+        internal fun copyOrCleanUp(
             input: InputStream,
             target: File,
         ): Result<Unit> =
