@@ -22,6 +22,7 @@ RF-01 es el primer requisito con datos reales. Al implementarlo aparecieron cuat
    - `core:testing` pasa a ser JVM para que las pruebas de `core:domain` usen sus fakes.
    - Kover verifica ≥ 80 % sobre todos los módulos `core` juntos (salvo `core:testing`) desde la raíz. Así las pruebas del dominio también cuentan para las clases de datos de `core:model`.
    - En cada informe se muestra la cobertura por módulo, para detectar un módulo débil tapado por los demás.
+   - Se excluye el código que generan Hilt (fábricas, inyectores, módulos) y Room (`*_Impl`), además de los puentes `$DefaultImpls` de Kotlin. Lo decidió el usuario el 2026-10-12. Sin esa exclusión, el total parecía de 84 %; medido solo sobre el código escrito a mano era de 78 %. Se agregaron las pruebas que faltaban, y al 2026-10-12 la cobertura queda en 94 % total y en 96 % o más en cada módulo core.
 
 ## Consecuencias
 

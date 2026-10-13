@@ -1,6 +1,11 @@
 package io.github.emilioabril05.folio.core.storage
 
+import android.content.ContentProvider
+import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
+import android.net.Uri
+import android.os.ParcelFileDescriptor
 import androidx.test.core.app.ApplicationProvider
 import io.github.emilioabril05.folio.core.domain.PageSource
 import io.github.emilioabril05.folio.core.domain.StorageError
@@ -17,9 +22,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import java.io.File
 import java.io.IOException
+import java.io.InputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -83,6 +90,39 @@ class FilePageStoreTest {
         }
 
     @Test
+    fun `si la copia falla a mitad de camino borra el archivo a medias`() {
+        val brokenSource =
+            object : InputStream() {
+                private var delivered = 0
+
+                override fun read(): Int =
+                    if (delivered++ <
+                        PARTIAL_BYTES
+                    ) {
+                        1
+                    } else {
+                        throw IOException("Lectura interrumpida")
+                    }
+            }
+
+        val result = store.copyOrCleanUp(brokenSource, original())
+
+        assertEquals(StorageError.Unknown, (result.exceptionOrNull() as StorageFailure).error)
+        assertFalse(original().exists())
+    }
+
+    @Test
+    fun `un origen sin permiso de lectura se informa como ilegible`() =
+        runTest {
+            Robolectric.buildContentProvider(DeniedProvider::class.java).create(DENIED_AUTHORITY)
+
+            val result = store.saveOriginal(documentId, pageId, PageSource("content://$DENIED_AUTHORITY/hoja.jpg"))
+
+            assertEquals(StorageError.SourceUnreadable, (result.exceptionOrNull() as StorageFailure).error)
+            assertFalse(original().exists())
+        }
+
+    @Test
     fun `traduce un error de disco lleno a espacio insuficiente`() {
         val error = IOException("write failed: ENOSPC (No space left on device)")
 
@@ -93,4 +133,47 @@ class FilePageStoreTest {
     fun `traduce otro error de disco a desconocido`() {
         assertEquals(StorageError.Unknown, IOException("boom").toStorageError())
     }
+
+    private companion object {
+        const val DENIED_AUTHORITY = "folio.prueba.denegado"
+        const val PARTIAL_BYTES = 3
+    }
+}
+
+/** Proveedor que niega la lectura, como una app que revoca el permiso de una URI compartida. */
+class DeniedProvider : ContentProvider() {
+    override fun onCreate(): Boolean = true
+
+    override fun openFile(
+        uri: Uri,
+        mode: String,
+    ): ParcelFileDescriptor = throw SecurityException("Permiso denegado")
+
+    override fun query(
+        uri: Uri,
+        projection: Array<out String>?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+        sortOrder: String?,
+    ): Cursor? = null
+
+    override fun getType(uri: Uri): String? = null
+
+    override fun insert(
+        uri: Uri,
+        values: ContentValues?,
+    ): Uri? = null
+
+    override fun delete(
+        uri: Uri,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+    ): Int = 0
+
+    override fun update(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+    ): Int = 0
 }

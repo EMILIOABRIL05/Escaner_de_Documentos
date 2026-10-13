@@ -51,6 +51,10 @@ gradlePlugin {
             id = libs.plugins.folio.quality.get().pluginId
             implementationClass = "QualityConventionPlugin"
         }
+        register("coverage") {
+            id = libs.plugins.folio.coverage.get().pluginId
+            implementationClass = "CoverageConventionPlugin"
+        }
         register("hilt") {
             id = libs.plugins.folio.hilt.get().pluginId
             implementationClass = "HiltConventionPlugin"
