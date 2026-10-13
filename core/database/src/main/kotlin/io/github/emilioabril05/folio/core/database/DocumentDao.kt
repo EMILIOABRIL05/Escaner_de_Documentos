@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 
 /** Acceso a los documentos y a sus páginas. */
 @Dao
@@ -34,6 +35,13 @@ interface DocumentDao {
     @Transaction
     suspend fun findDocumentWithPages(documentId: String): DocumentWithPages? =
         findDocument(documentId)?.let { DocumentWithPages(it, findPagesInOrder(documentId)) }
+
+    @Query("SELECT * FROM pages WHERE id = :pageId")
+    suspend fun findPage(pageId: String): PageEntity?
+
+    /** Guarda solo el recorte de la página; devuelve cuántas filas cambió (0 si no existe). */
+    @Update(entity = PageEntity::class)
+    suspend fun updatePageCrop(update: PageCropUpdate): Int
 
     @Query("SELECT COUNT(*) FROM documents")
     suspend fun count(): Int

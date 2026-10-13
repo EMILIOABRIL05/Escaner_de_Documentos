@@ -17,7 +17,11 @@ object DatabaseModule {
     @Singleton
     fun provideFolioDatabase(
         @ApplicationContext context: Context,
-    ): FolioDatabase = Room.databaseBuilder(context, FolioDatabase::class.java, FolioDatabase.NAME).build()
+    ): FolioDatabase =
+        Room
+            .databaseBuilder(context, FolioDatabase::class.java, FolioDatabase.NAME)
+            .addMigrations(Migration1To2)
+            .build()
 
     @Provides
     fun provideDocumentDao(database: FolioDatabase): DocumentDao = database.documentDao()

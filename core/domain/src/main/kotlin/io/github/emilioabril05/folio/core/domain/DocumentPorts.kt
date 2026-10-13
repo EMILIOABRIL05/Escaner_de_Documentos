@@ -1,7 +1,9 @@
 package io.github.emilioabril05.folio.core.domain
 
+import io.github.emilioabril05.folio.core.model.CropQuad
 import io.github.emilioabril05.folio.core.model.Document
 import io.github.emilioabril05.folio.core.model.DocumentId
+import io.github.emilioabril05.folio.core.model.Page
 import io.github.emilioabril05.folio.core.model.PageId
 import java.time.Instant
 
@@ -45,6 +47,15 @@ interface PageStore {
 interface DocumentRepository {
     /** Registra un documento nuevo con sus páginas. */
     suspend fun create(document: Document): Result<Unit>
+
+    /** La página [pageId], o `null` si no existe. */
+    suspend fun findPage(pageId: PageId): Result<Page?>
+
+    /** Guarda el recorte [crop] de la página [pageId] sin tocar su foto original. */
+    suspend fun updatePageCrop(
+        pageId: PageId,
+        crop: CropQuad,
+    ): Result<Unit>
 }
 
 /** Crea identificadores únicos. Inyectable para tener pruebas deterministas. */
@@ -60,4 +71,35 @@ interface IdProvider {
 fun interface DocumentTitleFormatter {
     /** El nombre por defecto para un documento creado en [createdAt]. */
     fun format(createdAt: Instant): String
+}
+
+/** Imagen codificada en JPEG, lista para mostrarse. */
+class EncodedImage(
+    val bytes: ByteArray,
+    val width: Int,
+    val height: Int,
+)
+
+/** Dibuja las páginas a partir de su foto original, sin modificarla. */
+interface PageRenderer {
+    /** La foto original completa, reducida para que su lado mayor no pase de [maxSidePx]. */
+    suspend fun original(
+        documentId: DocumentId,
+        pageId: PageId,
+        maxSidePx: Int,
+    ): Result<EncodedImage>
+
+    /** La hoja recortada con [crop] y con la perspectiva corregida, con su lado mayor de [maxSidePx] como máximo. */
+    suspend fun corrected(
+        documentId: DocumentId,
+        pageId: PageId,
+        crop: CropQuad,
+        maxSidePx: Int,
+    ): Result<EncodedImage>
+}
+
+/** Lugar donde la cámara del sistema escribe una foto nueva (una URI `content://` propia de la app). */
+fun interface PhotoCaptureTarget {
+    /** Un destino nuevo y vacío para una foto. */
+    fun newPhotoTarget(): PageSource
 }

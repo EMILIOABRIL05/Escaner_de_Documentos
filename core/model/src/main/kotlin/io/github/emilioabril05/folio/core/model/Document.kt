@@ -14,10 +14,11 @@ value class PageId(
     val value: String,
 )
 
-/** Una hoja del documento. Su foto original vive en disco y nunca se modifica. */
+/** Una hoja del documento. Su foto original vive en disco y nunca se modifica; el recorte es un parámetro. */
 data class Page(
     val id: PageId,
     val position: Int,
+    val crop: CropQuad = CropQuad.Full,
 )
 
 /** Una pila de hojas escaneadas, en orden. */

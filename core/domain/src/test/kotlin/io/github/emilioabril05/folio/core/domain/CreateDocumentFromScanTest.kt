@@ -1,6 +1,7 @@
 package io.github.emilioabril05.folio.core.domain
 
 import io.github.emilioabril05.folio.core.model.DocumentId
+import io.github.emilioabril05.folio.core.model.PageId
 import io.github.emilioabril05.folio.core.testing.FakeDocumentRepository
 import io.github.emilioabril05.folio.core.testing.FakePageStore
 import io.github.emilioabril05.folio.core.testing.SequentialIdProvider
@@ -30,7 +31,13 @@ class CreateDocumentFromScanTest {
 
             val result = useCase(repository = repository)(sources)
 
-            assertEquals(CreateDocumentResult.Created(DocumentId("doc-1"), pageCount = 3), result)
+            assertEquals(
+                CreateDocumentResult.Created(
+                    DocumentId("doc-1"),
+                    listOf(PageId("page-1"), PageId("page-2"), PageId("page-3")),
+                ),
+                result,
+            )
             val document = repository.documents.single()
             assertEquals(listOf(0, 1, 2), document.pages.map { it.position })
             assertEquals(listOf("page-1", "page-2", "page-3"), document.pages.map { it.id.value })

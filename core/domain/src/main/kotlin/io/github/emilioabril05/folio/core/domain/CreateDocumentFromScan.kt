@@ -3,16 +3,20 @@ package io.github.emilioabril05.folio.core.domain
 import io.github.emilioabril05.folio.core.model.Document
 import io.github.emilioabril05.folio.core.model.DocumentId
 import io.github.emilioabril05.folio.core.model.Page
+import io.github.emilioabril05.folio.core.model.PageId
 import java.time.Clock
 import javax.inject.Inject
 
 /** Resultado de crear un documento a partir de un escaneo. */
 sealed interface CreateDocumentResult {
-    /** El documento quedó guardado con [pageCount] páginas. */
+    /** El documento quedó guardado con las páginas [pageIds], en orden. */
     data class Created(
         val documentId: DocumentId,
-        val pageCount: Int,
-    ) : CreateDocumentResult
+        val pageIds: List<PageId>,
+    ) : CreateDocumentResult {
+        /** Cuántas páginas tiene el documento. */
+        val pageCount: Int get() = pageIds.size
+    }
 
     /** El escaneo no trajo ninguna página. */
     data object NoPages : CreateDocumentResult
@@ -54,7 +58,7 @@ class CreateDocumentFromScan
             val created = saved.andThen { documents.create(document) }
 
             return created.fold(
-                onSuccess = { CreateDocumentResult.Created(documentId, pages.size) },
+                onSuccess = { CreateDocumentResult.Created(documentId, pages.map { it.id }) },
                 onFailure = { failure ->
                     pageStore.deleteDocument(documentId)
                     CreateDocumentResult.Failed((failure as? StorageFailure)?.error ?: StorageError.Unknown)
