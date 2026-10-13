@@ -46,6 +46,14 @@ interface PageStore {
     /** Borra todos los archivos del documento [documentId]. */
     suspend fun deleteDocument(documentId: DocumentId): Result<Unit>
 
+    /** Copia el original de la página [fromPage] de [fromDocument] como original de [toPage] en [toDocument]. */
+    suspend fun copyOriginal(
+        fromDocument: DocumentId,
+        fromPage: PageId,
+        toDocument: DocumentId,
+        toPage: PageId,
+    ): Result<Unit>
+
     /** Borra la foto original de la página [pageId]. */
     suspend fun deleteOriginal(
         documentId: DocumentId,

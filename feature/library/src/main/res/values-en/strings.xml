@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="library_title">Documents</string>
+    <string name="library_trash_title">Trash</string>
+    <string name="library_scan">Scan</string>
+    <string name="library_search">Search by title</string>
+    <string name="library_open_trash">Open trash</string>
+    <string name="library_back">Back</string>
+    <string name="library_trash_hint">Documents are deleted forever after %1$d days.</string>
+    <string name="library_empty">Scan your first page</string>
+    <string name="library_no_results">No documents with that title</string>
+    <string name="library_trash_empty">Trash is empty</string>
+    <string name="library_group_today">Today</string>
+    <string name="library_group_week">This week</string>
+    <string name="library_group_earlier">Earlier</string>
+    <string name="library_more_actions">More actions for %1$s</string>
+    <string name="library_rename">Rename</string>
+    <string name="library_duplicate">Duplicate</string>
+    <string name="library_move_to_trash">Move to trash</string>
+    <string name="library_copy_title">%1$s (copy)</string>
+    <string name="library_restore">Restore %1$s</string>
+    <string name="library_delete_forever_named">Delete %1$s forever</string>
+    <string name="library_delete_forever">Delete forever</string>
+    <string name="library_delete_forever_title">Delete forever?</string>
+    <string name="library_delete_forever_message">"%1$s" will be deleted with all its pages. This can\'t be undone.</string>
+    <string name="library_cancel">Cancel</string>
+    <string name="library_save">Save</string>
+    <string name="library_trashed">Document moved to trash</string>
+    <string name="library_undo">Undo</string>
+    <string name="library_edit_failed">Couldn\'t save the change. Try again.</string>
+    <plurals name="library_pages">
+        <item quantity="one">%d page</item>
+        <item quantity="other">%d pages</item>
+    </plurals>
+</resources>

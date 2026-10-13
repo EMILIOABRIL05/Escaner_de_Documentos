@@ -41,4 +41,16 @@ class FakePageStore(
         savedOriginals.remove(pageId)
         return Result.success(Unit)
     }
+
+    override suspend fun copyOriginal(
+        fromDocument: DocumentId,
+        fromPage: PageId,
+        toDocument: DocumentId,
+        toPage: PageId,
+    ): Result<Unit> {
+        val source =
+            savedOriginals[fromPage]?.second ?: return Result.failure(StorageFailure(StorageError.SourceUnreadable))
+        savedOriginals[toPage] = toDocument to source
+        return Result.success(Unit)
+    }
 }

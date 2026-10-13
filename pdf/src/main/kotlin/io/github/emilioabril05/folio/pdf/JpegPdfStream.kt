@@ -63,7 +63,7 @@ internal class JpegPdfStream(
         val xrefStart = out.count
         val size = infoObject + 1
         val xref = StringBuilder("xref\n0 $size\n0000000000 65535 f \n")
-        (1 until size).forEach { number ->
+        for (number in 1 until size) {
             xref.append(offsets.getValue(number).toString().padStart(XREF_OFFSET_DIGITS, '0')).append(" 00000 n \n")
         }
         xref.append("trailer\n<< /Size $size /Root 1 0 R /Info $infoObject 0 R >>\nstartxref\n$xrefStart\n%%EOF\n")
@@ -102,23 +102,38 @@ private const val START_OF_IMAGE_LENGTH = 2
 private const val SEGMENT_HEADER = 4
 private const val COMPONENTS_OFFSET = 9
 private const val BYTE_MASK = 0xFF
+private const val MARKER_LENGTH_BYTES = 2
+private const val LENGTH_HIGH_OFFSET = 2
+private const val LENGTH_LOW_OFFSET = 3
 private const val BITS_PER_BYTE = 8
 private val START_OF_FRAME_MARKERS = (0xC0..0xCF).toSet() - setOf(0xC4, 0xC8, 0xCC)
 
 /** Número de canales del JPEG (1 = grises, 3 = color), leído de su marcador SOF. */
 internal fun jpegComponents(jpeg: ByteArray): Int {
     var index = START_OF_IMAGE_LENGTH
-    while (index + SEGMENT_HEADER < jpeg.size) {
-        if (jpeg[index].toInt() and BYTE_MASK != MARKER_PREFIX) return COLOR_COMPONENTS
+    var components = COLOR_COMPONENTS
+    var scanning = true
+    while (scanning && index + SEGMENT_HEADER < jpeg.size) {
         val marker = jpeg[index + 1].toInt() and BYTE_MASK
-        val high = jpeg[index + 2].toInt() and BYTE_MASK
-        val low = jpeg[index + 3].toInt() and BYTE_MASK
-        if (marker in START_OF_FRAME_MARKERS && index + COMPONENTS_OFFSET < jpeg.size) {
-            return jpeg[index + COMPONENTS_OFFSET].toInt() and BYTE_MASK
+        val high = jpeg[index + LENGTH_HIGH_OFFSET].toInt() and BYTE_MASK
+        val low = jpeg[index + LENGTH_LOW_OFFSET].toInt() and BYTE_MASK
+        val isFrame = marker in START_OF_FRAME_MARKERS && index + COMPONENTS_OFFSET < jpeg.size
+        when {
+            jpeg[index].toInt() and BYTE_MASK != MARKER_PREFIX -> {
+                scanning = false
+            }
+
+            isFrame -> {
+                components = jpeg[index + COMPONENTS_OFFSET].toInt() and BYTE_MASK
+                scanning = false
+            }
+
+            else -> {
+                index += MARKER_LENGTH_BYTES + ((high shl BITS_PER_BYTE) or low)
+            }
         }
-        index += 2 + ((high shl BITS_PER_BYTE) or low)
     }
-    return COLOR_COMPONENTS
+    return components
 }
 
 private class CountingOutputStream(

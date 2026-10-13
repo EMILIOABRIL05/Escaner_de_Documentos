@@ -41,6 +41,15 @@ private const val BOTTOM_RIGHT = 2
 private const val BOTTOM_LEFT = 3
 private const val MIN_SIDE_PX = 1
 
+// Todo lo que define cómo se dibuja una página.
+private data class RenderSpec(
+    val crop: CropQuad,
+    val rotation: Rotation,
+    val filter: PageFilter,
+    val maxSidePx: Int,
+    val jpegQuality: Int = PREVIEW_JPEG_QUALITY,
+)
+
 /**
  * Dibuja páginas con `Matrix.setPolyToPoly` de Android, sin OpenCV: lleva las 4 esquinas del recorte a un
  * rectángulo y así corrige la perspectiva. Decodifica la foto reducida para no cargar más píxeles de los
@@ -63,13 +72,15 @@ class BitmapPageRenderer
             pageId: PageId,
             crop: CropQuad,
             maxSidePx: Int,
-        ): Result<EncodedImage> = render(documentId, pageId, crop, Rotation.None, PageFilter.Original, maxSidePx)
+        ): Result<EncodedImage> =
+            render(documentId, pageId, RenderSpec(crop, Rotation.None, PageFilter.Original, maxSidePx))
 
         override suspend fun page(
             documentId: DocumentId,
             page: Page,
             maxSidePx: Int,
-        ): Result<EncodedImage> = render(documentId, page.id, page.crop, page.rotation, page.filter, maxSidePx)
+        ): Result<EncodedImage> =
+            render(documentId, page.id, RenderSpec(page.crop, page.rotation, page.filter, maxSidePx))
 
         override suspend fun export(
             documentId: DocumentId,
@@ -79,32 +90,31 @@ class BitmapPageRenderer
             render(
                 documentId = documentId,
                 pageId = page.id,
-                crop = page.crop,
-                rotation = page.rotation,
-                filter = page.filter,
-                maxSidePx = profile.maxSidePx,
-                jpegQuality = profile.jpegQuality,
+                spec =
+                    RenderSpec(
+                        crop = page.crop,
+                        rotation = page.rotation,
+                        filter = page.filter,
+                        maxSidePx = profile.maxSidePx,
+                        jpegQuality = profile.jpegQuality,
+                    ),
             )
 
         private suspend fun render(
             documentId: DocumentId,
             pageId: PageId,
-            crop: CropQuad,
-            rotation: Rotation,
-            filter: PageFilter,
-            maxSidePx: Int,
-            jpegQuality: Int = PREVIEW_JPEG_QUALITY,
+            spec: RenderSpec,
         ): Result<EncodedImage> =
             withContext(ioDispatcher) {
                 val file = originalFile(context, documentId, pageId)
-                val source = file.decodeForSide(maxSidePx)
+                val source = file.decodeForSide(spec.maxSidePx)
                 if (source == null) {
                     Result.failure(StorageFailure(StorageError.SourceUnreadable))
                 } else {
-                    val straight = source.straighten(crop, maxSidePx)
+                    val straight = source.straighten(spec.crop, spec.maxSidePx)
                     source.recycle()
-                    val filtered = straight.rotate(rotation).applyFilter(filter)
-                    Result.success(filtered.encode(jpegQuality).also { filtered.recycle() })
+                    val filtered = straight.rotate(spec.rotation).applyFilter(spec.filter)
+                    Result.success(filtered.encode(spec.jpegQuality).also { filtered.recycle() })
                 }
             }
 

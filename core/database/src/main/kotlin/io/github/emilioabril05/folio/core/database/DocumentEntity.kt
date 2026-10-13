@@ -10,4 +10,5 @@ data class DocumentEntity(
     val title: String,
     val createdAtMillis: Long,
     val updatedAtMillis: Long,
+    val trashedAtMillis: Long? = null,
 )

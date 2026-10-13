@@ -26,27 +26,31 @@ import kotlinx.coroutines.launch
 // Tope del selector de fotos por importación; suficiente para una prueba o un trámite largo.
 private const val MAX_IMPORTED_PHOTOS = 50
 
+/** Destinos a los que la captura puede llevar al terminar. */
+class CaptureNavigation(
+    val onEditCrop: (DocumentId, PageId) -> Unit,
+    val onOpenReview: (DocumentId) -> Unit,
+    val onPagesAdded: () -> Unit,
+)
+
 /**
  * Conecta el escáner y la cámara del sistema con la pantalla de captura.
- * Tras guardar abre la revisión ([onOpenReview]) o, si es una sola foto, también su recorte ([onEditCrop]);
- * en modo de añadir páginas, vuelve con [onPagesAdded].
+ * Tras guardar abre la revisión ([CaptureNavigation.onOpenReview]) o, si es una sola foto,
+ * también su recorte ([CaptureNavigation.onEditCrop]); en modo de añadir páginas,
+ * vuelve con [CaptureNavigation.onPagesAdded].
  */
 @Composable
 fun CaptureRoute(
     scanner: DocumentScanner,
     photoTarget: PhotoCaptureTarget,
-    onEditCrop: (DocumentId, PageId) -> Unit,
-    onOpenReview: (DocumentId) -> Unit,
-    onPagesAdded: () -> Unit,
+    navigation: CaptureNavigation,
     modifier: Modifier = Modifier,
     viewModel: CaptureViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val activity = LocalActivity.current
     val scope = rememberCoroutineScope()
-    val currentOnEditCrop by rememberUpdatedState(onEditCrop)
-    val currentOnOpenReview by rememberUpdatedState(onOpenReview)
-    val currentOnPagesAdded by rememberUpdatedState(onPagesAdded)
+    val currentNavigation by rememberUpdatedState(navigation)
     var pendingPhoto by rememberSaveable { mutableStateOf<String?>(null) }
 
     val scanLauncher =
@@ -70,9 +74,9 @@ fun CaptureRoute(
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
-                is CaptureEffect.EditCrop -> currentOnEditCrop(effect.documentId, effect.pageId)
-                is CaptureEffect.OpenReview -> currentOnOpenReview(effect.documentId)
-                CaptureEffect.PagesAdded -> currentOnPagesAdded()
+                is CaptureEffect.EditCrop -> currentNavigation.onEditCrop(effect.documentId, effect.pageId)
+                is CaptureEffect.OpenReview -> currentNavigation.onOpenReview(effect.documentId)
+                CaptureEffect.PagesAdded -> currentNavigation.onPagesAdded()
             }
         }
     }

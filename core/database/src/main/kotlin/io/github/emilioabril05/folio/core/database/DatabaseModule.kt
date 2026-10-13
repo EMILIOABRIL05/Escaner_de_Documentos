@@ -20,9 +20,12 @@ object DatabaseModule {
     ): FolioDatabase =
         Room
             .databaseBuilder(context, FolioDatabase::class.java, FolioDatabase.NAME)
-            .addMigrations(Migration1To2, Migration2To3)
+            .addMigrations(Migration1To2, Migration2To3, Migration3To4)
             .build()
 
     @Provides
     fun provideDocumentDao(database: FolioDatabase): DocumentDao = database.documentDao()
+
+    @Provides
+    fun provideLibraryDao(database: FolioDatabase): LibraryDao = database.libraryDao()
 }
