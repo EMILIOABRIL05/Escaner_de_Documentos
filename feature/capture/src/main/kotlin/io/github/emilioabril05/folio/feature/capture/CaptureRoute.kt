@@ -28,13 +28,16 @@ private const val MAX_IMPORTED_PHOTOS = 50
 
 /**
  * Conecta el escáner y la cámara del sistema con la pantalla de captura.
- * Cuando hay que recortar a mano una foto recién tomada, llama a [onEditCrop].
+ * Tras guardar abre la revisión ([onOpenReview]) o, si es una sola foto, también su recorte ([onEditCrop]);
+ * en modo de añadir páginas, vuelve con [onPagesAdded].
  */
 @Composable
 fun CaptureRoute(
     scanner: DocumentScanner,
     photoTarget: PhotoCaptureTarget,
     onEditCrop: (DocumentId, PageId) -> Unit,
+    onOpenReview: (DocumentId) -> Unit,
+    onPagesAdded: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CaptureViewModel = hiltViewModel(),
 ) {
@@ -42,6 +45,8 @@ fun CaptureRoute(
     val activity = LocalActivity.current
     val scope = rememberCoroutineScope()
     val currentOnEditCrop by rememberUpdatedState(onEditCrop)
+    val currentOnOpenReview by rememberUpdatedState(onOpenReview)
+    val currentOnPagesAdded by rememberUpdatedState(onPagesAdded)
     var pendingPhoto by rememberSaveable { mutableStateOf<String?>(null) }
 
     val scanLauncher =
@@ -66,6 +71,8 @@ fun CaptureRoute(
         viewModel.effects.collect { effect ->
             when (effect) {
                 is CaptureEffect.EditCrop -> currentOnEditCrop(effect.documentId, effect.pageId)
+                is CaptureEffect.OpenReview -> currentOnOpenReview(effect.documentId)
+                CaptureEffect.PagesAdded -> currentOnPagesAdded()
             }
         }
     }

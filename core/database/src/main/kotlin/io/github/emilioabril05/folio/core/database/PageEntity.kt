@@ -50,7 +50,12 @@ data class PageEntity(
     val documentId: String,
     val position: Int,
     @Embedded val crop: CropColumns = CropColumns.Full,
+    @ColumnInfo(defaultValue = "0") val rotationDegrees: Int = 0,
+    @ColumnInfo(defaultValue = "'Document'") val filter: String = DEFAULT_FILTER,
 )
+
+/** Nombre del filtro por defecto de una página, igual que `PageFilter.Document`. */
+const val DEFAULT_FILTER = "Document"
 
 /** Solo el recorte de una página, para actualizarlo sin tocar el resto de la fila. */
 data class PageCropUpdate(

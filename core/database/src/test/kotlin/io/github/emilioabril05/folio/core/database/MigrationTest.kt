@@ -39,6 +39,25 @@ class MigrationTest {
         }
     }
 
+    @Test
+    fun `migrar de la versión 2 a la 3 conserva la página y la deja sin girar`() {
+        helper.createDatabase(2).use { connection ->
+            connection.execSQL(
+                "INSERT INTO documents (id, title, createdAtMillis, updatedAtMillis) VALUES ('doc-1', 'Escaneo', 1, 2)",
+            )
+            connection.execSQL(
+                "INSERT INTO pages (id, documentId, position, ${FULL_PHOTO_COLUMNS.joinToString()}) " +
+                    "VALUES ('p-1', 'doc-1', 4, ${FULL_PHOTO.joinToString()})",
+            )
+        }
+
+        helper.runMigrationsAndValidate(3, listOf(Migration2To3)).use { connection ->
+            assertEquals("p-1 doc-1 4", connection.readPageColumns("id", "documentId", "position"))
+            assertEquals(listOf(0.0), connection.readPageNumbers("rotationDegrees"))
+            assertEquals("Document", connection.readPageColumns("filter"))
+        }
+    }
+
     private fun SQLiteConnection.readPageColumns(vararg columns: String): String =
         prepare("SELECT ${columns.joinToString()} FROM pages").use { statement ->
             statement.step()

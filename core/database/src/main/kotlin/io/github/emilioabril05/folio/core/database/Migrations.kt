@@ -13,6 +13,15 @@ internal val Migration1To2: Migration =
         }
     }
 
+/** Versión 2 a 3: cada página guarda su giro en grados y su filtro; las existentes quedan sin girar. */
+internal val Migration2To3: Migration =
+    object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE pages ADD COLUMN rotationDegrees INTEGER NOT NULL DEFAULT 0")
+            db.execSQL("ALTER TABLE pages ADD COLUMN filter TEXT NOT NULL DEFAULT 'Document'")
+        }
+    }
+
 private val CROP_COLUMN_DEFAULTS =
     listOf(
         "cropTopLeftX" to "0.0",

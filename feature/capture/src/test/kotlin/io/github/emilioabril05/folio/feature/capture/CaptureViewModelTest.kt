@@ -1,7 +1,9 @@
 package io.github.emilioabril05.folio.feature.capture
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import io.github.emilioabril05.folio.core.domain.AddPagesToDocument
 import io.github.emilioabril05.folio.core.domain.CreateDocumentFromScan
 import io.github.emilioabril05.folio.core.domain.DocumentTitleFormatter
 import io.github.emilioabril05.folio.core.domain.StorageError
@@ -34,6 +36,7 @@ class CaptureViewModelTest {
 
     private fun viewModel(store: FakePageStore = FakePageStore()) =
         CaptureViewModel(
+            SavedStateHandle(),
             CreateDocumentFromScan(
                 pageStore = store,
                 documents = repository,
@@ -41,6 +44,7 @@ class CaptureViewModelTest {
                 titles = DocumentTitleFormatter { "Escaneo $it" },
                 clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC),
             ),
+            AddPagesToDocument(store, repository, SequentialIdProvider(), Clock.fixed(Instant.EPOCH, ZoneOffset.UTC)),
         )
 
     @Test

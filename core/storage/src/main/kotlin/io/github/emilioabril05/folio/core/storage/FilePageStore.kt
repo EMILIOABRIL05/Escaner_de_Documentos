@@ -47,6 +47,19 @@ class FilePageStore
                 }
             }
 
+        override suspend fun deleteOriginal(
+            documentId: DocumentId,
+            pageId: PageId,
+        ): Result<Unit> =
+            withContext(ioDispatcher) {
+                val file = originalFile(context, documentId, pageId)
+                if (file.delete() || !file.exists()) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(StorageFailure(StorageError.Unknown))
+                }
+            }
+
         private fun openSource(source: PageSource): InputStream? =
             try {
                 context.contentResolver.openInputStream(Uri.parse(source.value))
