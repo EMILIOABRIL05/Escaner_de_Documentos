@@ -21,4 +21,5 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Seguridad
 
+- Folio bloquea los datos de uso que el escáner de Google intentaba enviar.
 - Folio no pide el identificador de publicidad, no envía tus datos a la copia en la nube y no permite conexiones sin cifrar.

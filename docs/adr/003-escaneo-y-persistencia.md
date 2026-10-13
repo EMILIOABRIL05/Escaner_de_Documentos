@@ -27,6 +27,7 @@ RF-01 es el primer requisito con datos reales. Al implementarlo aparecieron cuat
 ## Consecuencias
 
 - **Permisos que llegan con ML Kit:** `INTERNET` y `ACCESS_NETWORK_STATE`. No pide cámara ni `AD_ID` (lo vigila `AppManifestTest`). La política de privacidad lo explica.
+- **Telemetría de ML Kit bloqueada** (RNF-09, decisión del usuario del 2026-10-13). ML Kit encola eventos `FIREBASE_ML_SDK` para enviarlos a Google por `datatransport` (backend `cct`). El manifiesto de la app quita ese backend (`tools:node="remove"`) y `AppManifestTest` lo vigila. Verificado en un Xiaomi con Android 14: "Transport backend 'cct' is not registered", la cola queda vacía y el escáner sigue funcionando.
 - **Lo que no se prueba en local:** el lanzamiento real del escáner necesita Google Play services y un dispositivo. Las pruebas locales cubren el contrato con un escáner falso, la interpretación del resultado y los estados de la pantalla.
 - **Nombre automático:** se forma en `app` con `strings.xml` ("Escaneo 2026-10-12 22.30" / "Scan …") y fecha ISO 8601, porque el dominio no conoce recursos de Android.
 - **Deuda pendiente:**
