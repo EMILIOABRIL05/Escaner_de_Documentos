@@ -17,11 +17,12 @@
     </plurals>
 
     <string name="capture_error_unavailable_title">This phone doesn\'t have the scanner</string>
-    <string name="capture_error_unavailable_solution">Update Google Play services and try again.</string>
+    <string name="capture_error_unavailable_solution">Use the phone camera and adjust the corners by hand.</string>
     <string name="capture_error_space_title">Not enough space to save</string>
     <string name="capture_error_space_solution">Free up space on your phone and scan again.</string>
     <string name="capture_error_unreadable_title">A page couldn\'t be read</string>
     <string name="capture_error_unreadable_solution">Scan the pages again.</string>
     <string name="capture_error_unknown_title">Couldn\'t scan</string>
     <string name="capture_error_unknown_solution">Try again.</string>
+    <string name="capture_action_use_camera">Use the camera</string>
 </resources>

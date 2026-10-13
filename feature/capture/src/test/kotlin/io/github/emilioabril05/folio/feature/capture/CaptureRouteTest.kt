@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.github.emilioabril05.folio.core.designsystem.theme.FolioTheme
 import io.github.emilioabril05.folio.core.domain.CreateDocumentFromScan
 import io.github.emilioabril05.folio.core.domain.DocumentTitleFormatter
+import io.github.emilioabril05.folio.core.domain.PageSource
 import io.github.emilioabril05.folio.core.testing.FakeDocumentRepository
 import io.github.emilioabril05.folio.core.testing.FakePageStore
 import io.github.emilioabril05.folio.core.testing.SequentialIdProvider
@@ -58,7 +59,14 @@ class CaptureRouteTest {
                 ),
             )
         composeRule.setContent {
-            FolioTheme { CaptureRoute(scanner = unavailableScanner, viewModel = viewModel) }
+            FolioTheme {
+                CaptureRoute(
+                    scanner = unavailableScanner,
+                    photoTarget = { PageSource("content://folio.files/captures/foto.jpg") },
+                    onEditCrop = { _, _ -> },
+                    viewModel = viewModel,
+                )
+            }
         }
 
         composeRule.onNode(hasText("Escanear") and hasClickAction()).performClick()

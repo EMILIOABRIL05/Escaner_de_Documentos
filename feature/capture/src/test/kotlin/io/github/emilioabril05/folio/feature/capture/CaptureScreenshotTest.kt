@@ -52,7 +52,7 @@ class CaptureScreenshotTest {
                 CompositionLocalProvider(LocalDensity provides Density(density.density, variant.fontScale)) {
                     FolioTheme(darkTheme = variant.darkTheme) {
                         Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                            CaptureScreen(uiState = state, onScan = {})
+                            CaptureScreen(uiState = state, onScan = {}, onUseCamera = {})
                         }
                     }
                 }
