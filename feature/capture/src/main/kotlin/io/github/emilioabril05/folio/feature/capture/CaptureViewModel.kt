@@ -64,6 +64,11 @@ sealed interface CaptureEvent {
     data class PhotoTaken(
         val photo: Uri,
     ) : CaptureEvent
+
+    /** El usuario eligió [photos] en el selector de fotos del sistema, en ese orden. */
+    data class PhotosImported(
+        val photos: List<Uri>,
+    ) : CaptureEvent
 }
 
 /** Efectos de una sola vez. */
@@ -108,9 +113,11 @@ class CaptureViewModel
                 }
 
                 is CaptureEvent.PhotoTaken -> {
-                    save(listOf(event.photo)) { created ->
-                        effectChannel.send(CaptureEffect.EditCrop(created.documentId, created.pageIds.first()))
-                    }
+                    savePhotos(listOf(event.photo))
+                }
+
+                is CaptureEvent.PhotosImported -> {
+                    savePhotos(event.photos)
                 }
             }
         }
@@ -120,6 +127,16 @@ class CaptureViewModel
                 is ScanOutcome.Success -> save(outcome.pages)
                 ScanOutcome.Cancelled -> state.value = CaptureUiState.Idle
                 is ScanOutcome.Failed -> state.value = CaptureUiState.Failed(outcome.reason.toFailure())
+            }
+        }
+
+        // Una sola foto casi nunca viene recortada: se abre el editor. Varias se revisan después (RF-04).
+        private fun savePhotos(photos: List<Uri>) {
+            if (photos.isEmpty()) return
+            save(photos) { created ->
+                if (created.pageCount == 1) {
+                    effectChannel.send(CaptureEffect.EditCrop(created.documentId, created.pageIds.first()))
+                }
             }
         }
 

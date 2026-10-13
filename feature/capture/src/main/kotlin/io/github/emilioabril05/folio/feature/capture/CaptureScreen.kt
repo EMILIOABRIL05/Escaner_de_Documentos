@@ -36,13 +36,15 @@ private val IllustrationSize = 64.dp
 
 /**
  * Pantalla de captura sin estado: muestra [uiState], llama a [onScan] para abrir el escáner y a [onUseCamera]
- * para usar la cámara del sistema cuando el escáner no existe en el teléfono.
+ * para usar la cámara del sistema cuando el escáner no existe en el teléfono y a [onImport] para elegir fotos
+ * de la galería con el selector del sistema.
  */
 @Composable
 fun CaptureScreen(
     uiState: CaptureUiState,
     onScan: () -> Unit,
     onUseCamera: () -> Unit,
+    onImport: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scannerMissing = uiState == CaptureUiState.Failed(CaptureFailure.ScannerUnavailable)
@@ -57,6 +59,12 @@ fun CaptureScreen(
             contentAlignment = Alignment.Center,
         ) {
             StateMessage(content = content, saving = uiState is CaptureUiState.Saving)
+        }
+        if (uiState !is CaptureUiState.Saving) {
+            TextButton(
+                onClick = onImport,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = FolioSpacing.m),
+            ) { Text(stringResource(R.string.capture_action_import)) }
         }
         if (scannerMissing && content.action != null) {
             TextButton(
