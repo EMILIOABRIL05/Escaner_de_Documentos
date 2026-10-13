@@ -59,7 +59,7 @@ internal class JpegPdfStream(
     /** Cierra el PDF con su tabla de referencias. */
     fun finish() {
         val infoObject = FIRST_PAGE_OBJECT + pageCount * OBJECTS_PER_PAGE
-        writeObject(infoObject, "<< /Producer (Folio) >>")
+        writeObject(infoObject, "<< /Producer (APUNT) >>")
         val xrefStart = out.count
         val size = infoObject + 1
         val xref = StringBuilder("xref\n0 $size\n0000000000 65535 f \n")

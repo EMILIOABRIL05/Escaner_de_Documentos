@@ -1,4 +1,4 @@
-# Folio
+# APUNT
 
 Escáner de documentos para Android: fotos de hojas → PDF liviano → compartir.
 Sin anuncios, sin cuentas, sin rastreadores y sin conexión obligatoria.
