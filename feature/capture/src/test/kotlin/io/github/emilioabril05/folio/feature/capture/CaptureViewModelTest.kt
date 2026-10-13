@@ -120,6 +120,46 @@ class CaptureViewModelTest {
         }
 
     @Test
+    fun `importar varias fotos de la galería las guarda en el orden elegido`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.onEvent(CaptureEvent.PhotosImported(pages))
+
+            assertEquals(CaptureUiState.Saved(pageCount = 3), viewModel.uiState.value)
+            assertEquals(
+                listOf(0, 1, 2),
+                repository.documents
+                    .single()
+                    .pages
+                    .map { it.position },
+            )
+        }
+
+    @Test
+    fun `importar una sola foto abre el recorte`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.effects.test {
+                viewModel.onEvent(CaptureEvent.PhotosImported(pages.take(1)))
+
+                assertEquals(CaptureEffect.EditCrop(DocumentId("doc-1"), PageId("page-1")), awaitItem())
+            }
+        }
+
+    @Test
+    fun `cerrar el selector sin elegir fotos no cambia nada`() =
+        runTest {
+            val viewModel = viewModel()
+
+            viewModel.onEvent(CaptureEvent.PhotosImported(emptyList()))
+
+            assertEquals(CaptureUiState.Idle, viewModel.uiState.value)
+            assertEquals(emptyList<Any>(), repository.documents)
+        }
+
+    @Test
     fun `al cerrar el mensaje vuelve a estar listo`() =
         runTest {
             val viewModel = viewModel()

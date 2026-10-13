@@ -3,6 +3,7 @@ package io.github.emilioabril05.folio.feature.capture
 import android.net.Uri
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +22,9 @@ import io.github.emilioabril05.folio.core.model.PageId
 import io.github.emilioabril05.folio.engine.api.DocumentScanner
 import io.github.emilioabril05.folio.engine.api.ScanLaunch
 import kotlinx.coroutines.launch
+
+// Tope del selector de fotos por importación; suficiente para una prueba o un trámite largo.
+private const val MAX_IMPORTED_PHOTOS = 50
 
 /**
  * Conecta el escáner y la cámara del sistema con la pantalla de captura.
@@ -51,6 +55,13 @@ fun CaptureRoute(
             if (saved && photo != null) viewModel.onEvent(CaptureEvent.PhotoTaken(Uri.parse(photo)))
         }
 
+    val galleryLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia(MAX_IMPORTED_PHOTOS),
+        ) { photos ->
+            viewModel.onEvent(CaptureEvent.PhotosImported(photos))
+        }
+
     LaunchedEffect(viewModel) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -75,6 +86,9 @@ fun CaptureRoute(
             val target = photoTarget.newPhotoTarget().value
             pendingPhoto = target
             cameraLauncher.launch(Uri.parse(target))
+        },
+        onImport = {
+            galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
         modifier = modifier,
     )

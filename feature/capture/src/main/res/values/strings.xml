@@ -27,4 +27,5 @@
     <string name="capture_error_unknown_title">No se pudo escanear</string>
     <string name="capture_error_unknown_solution">Vuelve a intentarlo.</string>
     <string name="capture_action_use_camera">Usar la cámara</string>
+    <string name="capture_action_import">Desde la galería</string>
 </resources>

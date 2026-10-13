@@ -25,10 +25,18 @@ class CaptureScreenTest {
 
     private var scans = 0
     private var cameraUses = 0
+    private var imports = 0
 
     private fun show(state: CaptureUiState) {
         composeRule.setContent {
-            FolioTheme { CaptureScreen(uiState = state, onScan = { scans++ }, onUseCamera = { cameraUses++ }) }
+            FolioTheme {
+                CaptureScreen(
+                    uiState = state,
+                    onScan = { scans++ },
+                    onUseCamera = { cameraUses++ },
+                    onImport = { imports++ },
+                )
+            }
         }
     }
 
@@ -40,6 +48,14 @@ class CaptureScreenTest {
         composeRule.onNodeWithText("Pon la hoja sobre un fondo oscuro y con buena luz.").assertIsDisplayed()
         composeRule.onNode(hasText("Escanear") and hasClickAction()).performClick()
         assertEquals(1, scans)
+    }
+
+    @Test
+    fun `listo permite importar fotos de la galería`() {
+        show(CaptureUiState.Idle)
+
+        composeRule.onNode(hasText("Desde la galería") and hasClickAction()).performClick()
+        assertEquals(1, imports)
     }
 
     @Test

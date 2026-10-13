@@ -25,4 +25,5 @@
     <string name="capture_error_unknown_title">Couldn\'t scan</string>
     <string name="capture_error_unknown_solution">Try again.</string>
     <string name="capture_action_use_camera">Use the camera</string>
+    <string name="capture_action_import">From gallery</string>
 </resources>
